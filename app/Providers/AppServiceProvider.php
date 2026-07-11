@@ -29,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
         View::share('setting', $setting ?? new Setting());
 
         try {
-            if (!app()->runningInConsole()) {
+            if (!app()->runningInConsole() || app()->runningUnitTests()) {
                 $permissions = \Illuminate\Support\Facades\Cache::remember('permissions_with_roles', now()->addHours(24), function () {
                     return \App\Models\Permission::with('roles')->get();
                 });

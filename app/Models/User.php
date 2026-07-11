@@ -35,6 +35,11 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
+    public function employee()
+    {
+        return $this->hasOne(Employee::class);
+    }
+
     public function isSuperAdmin(): bool
     {
         return $this->role?->slug === 'super-admin';

@@ -34,6 +34,13 @@ Route::middleware('auth')->group(function () {
     Route::resource('/positions', PositionController::class)->except(['show']);
     Route::resource('/salary-components', SalaryComponentController::class)->except(['show']);
     Route::resource('/salary-structures', SalaryStructureController::class)->except(['show']);
+    
+    // Employee Data Management
+    Route::resource('/employees', \App\Http\Controllers\EmployeeController::class);
+    Route::post('/employees/{employee}/bank-accounts', [\App\Http\Controllers\EmployeeBankAccountController::class, 'store'])->name('employees.bank-accounts.store');
+    Route::put('/employees/{employee}/bank-accounts/{bank_account}', [\App\Http\Controllers\EmployeeBankAccountController::class, 'update'])->name('employees.bank-accounts.update');
+    Route::delete('/employees/{employee}/bank-accounts/{bank_account}', [\App\Http\Controllers\EmployeeBankAccountController::class, 'destroy'])->name('employees.bank-accounts.destroy');
+
     Route::get('/setting', [SettingController::class, 'index'])->name('setting.index');
     Route::put('/setting/{setting}/update', [SettingController::class, 'update'])->name('setting.update');
 });

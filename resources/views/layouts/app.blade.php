@@ -324,6 +324,16 @@
                 </li>
             @endcan
 
+            @can('view-employees')
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('employees.*') ? '' : 'collapsed' }}"
+                        href="{{ route('employees.index') }}">
+                        <i class='bx bx-group'></i>
+                        <span>Employees</span>
+                    </a>
+                </li>
+            @endcan
+
             @can('view-users')
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('user.*') ? '' : 'collapsed' }}"
