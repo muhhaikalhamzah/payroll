@@ -5,8 +5,8 @@
     </div>
     <div class="col-md-8">
         <h4 class="fw-bold mb-3">{{ $user->name }}</h4>
-        <div class="mb-3">
-            <span class="badge bg-primary fs-6">{{ $user->role }}</span>
+        <div class="mb-3 text-center">
+            <span class="badge bg-primary fs-6">{{ $user->role?->name }}</span>
         </div>
         <div class="list-group list-group-flush">
             <div class="list-group-item px-0 border-0">

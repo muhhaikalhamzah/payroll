@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
 {
@@ -14,6 +16,8 @@ class UserController extends Controller
      */
     public function index()
     {
+        Gate::authorize('viewAny', User::class);
+
         return view('user.index', [
             'title' => 'User',
             'users' => User::latest()->get(),
@@ -25,8 +29,11 @@ class UserController extends Controller
      */
     public function create()
     {
+        Gate::authorize('create', User::class);
+
         return view('user.create', [
             'title' => 'Create User',
+            'roles' => Role::all(),
         ]);
     }
 
@@ -35,17 +42,19 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        Gate::authorize('create', User::class);
 
         $validate = $request->validate([
             'name' => 'required',
-            'role' => 'required',
+            'role_id' => 'required|exists:roles,id',
             'password' => 'required|min:8',
             'passwordconfirm' => 'required|same:password',
             'email' => 'required|email|lowercase|unique:users,email',
             'avatar' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:512'
         ], [
             'name.required' => 'Nama wajib diisi',
-            'role.required' => 'Role wajib diisi',
+            'role_id.required' => 'Role wajib diisi',
+            'role_id.exists' => 'Role tidak valid',
             'password.required' => 'Password wajib diisi',
             'password.min' => 'Password minimal 8 karakter',
             'passwordconfirm.required' => 'Konfirmasi password wajib diisi',
@@ -83,6 +92,8 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
+        Gate::authorize('view', $user);
+
         return view('user.show', [
             'title' => 'Detail User',
             'user' => $user,
@@ -94,9 +105,12 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
+        Gate::authorize('update', $user);
+
         return view('user.edit', [
             'title' => 'Edit User',
             'user' => $user,
+            'roles' => Role::all(),
         ]);
     }
 
@@ -105,17 +119,19 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        Gate::authorize('update', $user);
 
         $validate = $request->validate([
             'name' => 'required',
-            'role' => 'required',
+            'role_id' => 'required|exists:roles,id',
             'password' => 'nullable|min:8',
             'passwordconfirm' => 'nullable|same:password',
             'email' => 'required|email|lowercase|unique:users,email,' . $user->id,
             'avatar' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:512'
         ], [
             'name.required' => 'Nama wajib diisi',
-            'role.required' => 'Role wajib diisi',
+            'role_id.required' => 'Role wajib diisi',
+            'role_id.exists' => 'Role tidak valid',
             'password.min' => 'Password minimal 8 karakter',
             'passwordconfirm.same' => 'Konfirmasi password tidak cocok',
             'email.required' => 'Email wajib diisi',
@@ -137,7 +153,7 @@ class UserController extends Controller
                 }
             }
 
-            if ($user->password) {
+            if ($request->filled('password')) {
                 $validate['password'] = bcrypt($request->password);
             } else {
                 unset($validate['password']);
@@ -157,6 +173,8 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        Gate::authorize('delete', $user);
+
         DB::beginTransaction();
 
         try {

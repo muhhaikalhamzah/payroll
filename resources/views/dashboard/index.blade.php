@@ -12,7 +12,7 @@
                         Selamat Datang, {{ Auth::user()->name }}!
                     </h3>
                     <p class="text-muted mb-0">
-                        Anda login sebagai <span class="badge bg-primary">{{ Auth::user()->role }}</span>
+                        Anda login sebagai <span class="badge bg-primary">{{ Auth::user()->role?->name }}</span>
                     </p>
                     <p class="text-muted mt-2">
                         <i class='bx bx-time-five me-1'></i>
