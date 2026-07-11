@@ -24,29 +24,32 @@ class RolePermissionSeeder extends Seeder
             'view-salary-structures', 'manage-salary-structures',
             'view-employees', 'manage-employees',
             'view-bank-accounts', 'manage-bank-accounts',
+            'view-attendances', 'manage-attendances', 'import-attendances',
+            'view-overtime-requests', 'submit-overtime-requests', 'approve-overtime-requests', 'manage-overtime-requests',
         ];
 
         $permissionModels = [];
         foreach ($permissionsList as $perm) {
-            $permissionModels[$perm] = \App\Models\Permission::create([
-                'name' => ucwords(str_replace('-', ' ', $perm)),
+            $permissionModels[$perm] = \App\Models\Permission::firstOrCreate([
                 'slug' => $perm
+            ], [
+                'name' => ucwords(str_replace('-', ' ', $perm))
             ]);
         }
 
         // Define Roles
-        $superAdmin = \App\Models\Role::create(['name' => 'Super Admin', 'slug' => 'super-admin']);
-        $hrAdmin = \App\Models\Role::create(['name' => 'HR Admin', 'slug' => 'hr-admin']);
-        $financeAdmin = \App\Models\Role::create(['name' => 'Finance Admin', 'slug' => 'finance-admin']);
-        $manager = \App\Models\Role::create(['name' => 'Manager', 'slug' => 'manager']);
-        $employee = \App\Models\Role::create(['name' => 'Employee', 'slug' => 'employee']);
+        $superAdmin = \App\Models\Role::firstOrCreate(['slug' => 'super-admin'], ['name' => 'Super Admin']);
+        $hrAdmin = \App\Models\Role::firstOrCreate(['slug' => 'hr-admin'], ['name' => 'HR Admin']);
+        $financeAdmin = \App\Models\Role::firstOrCreate(['slug' => 'finance-admin'], ['name' => 'Finance Admin']);
+        $manager = \App\Models\Role::firstOrCreate(['slug' => 'manager'], ['name' => 'Manager']);
+        $employee = \App\Models\Role::firstOrCreate(['slug' => 'employee'], ['name' => 'Employee']);
 
         // Assign Permissions
         // Super Admin gets all
-        $superAdmin->permissions()->attach(array_column($permissionModels, 'id'));
+        $superAdmin->permissions()->syncWithoutDetaching(array_column($permissionModels, 'id'));
 
         // HR Admin
-        $hrAdmin->permissions()->attach([
+        $hrAdmin->permissions()->syncWithoutDetaching([
             $permissionModels['view-users']->id,
             $permissionModels['create-user']->id,
             $permissionModels['update-user']->id,
@@ -63,25 +66,36 @@ class RolePermissionSeeder extends Seeder
             $permissionModels['manage-employees']->id,
             $permissionModels['view-bank-accounts']->id,
             $permissionModels['manage-bank-accounts']->id,
+            $permissionModels['view-attendances']->id,
+            $permissionModels['manage-attendances']->id,
+            $permissionModels['import-attendances']->id,
+            $permissionModels['view-overtime-requests']->id,
+            $permissionModels['manage-overtime-requests']->id,
         ]);
 
         // Finance Admin
-        $financeAdmin->permissions()->attach([
+        $financeAdmin->permissions()->syncWithoutDetaching([
             $permissionModels['create-payroll-run']->id,
             $permissionModels['approve-payroll-run']->id,
             $permissionModels['view-payslip-all']->id,
         ]);
 
         // Manager
-        $manager->permissions()->attach([
+        $manager->permissions()->syncWithoutDetaching([
             $permissionModels['approve-leave-request']->id,
             $permissionModels['view-payslip-own']->id,
+            $permissionModels['view-attendances']->id,
+            $permissionModels['view-overtime-requests']->id,
+            $permissionModels['approve-overtime-requests']->id,
         ]);
 
         // Employee
-        $employee->permissions()->attach([
+        $employee->permissions()->syncWithoutDetaching([
             $permissionModels['submit-leave-request']->id,
             $permissionModels['view-payslip-own']->id,
+            $permissionModels['view-attendances']->id,
+            $permissionModels['view-overtime-requests']->id,
+            $permissionModels['submit-overtime-requests']->id,
         ]);
     }
 }

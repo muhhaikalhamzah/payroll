@@ -41,6 +41,12 @@ Route::middleware('auth')->group(function () {
     Route::put('/employees/{employee}/bank-accounts/{bank_account}', [\App\Http\Controllers\EmployeeBankAccountController::class, 'update'])->name('employees.bank-accounts.update');
     Route::delete('/employees/{employee}/bank-accounts/{bank_account}', [\App\Http\Controllers\EmployeeBankAccountController::class, 'destroy'])->name('employees.bank-accounts.destroy');
 
-    Route::get('/setting', [SettingController::class, 'index'])->name('setting.index');
-    Route::put('/setting/{setting}/update', [SettingController::class, 'update'])->name('setting.update');
+    Route::resource('/setting', SettingController::class)->only(['index', 'update']); // Simplified Setting route
+
+    // Attendance and Overtime
+    Route::get('/attendance-records/import', [\App\Http\Controllers\AttendanceController::class, 'importForm'])->name('attendance-records.import-form');
+    Route::post('/attendance-records/import', [\App\Http\Controllers\AttendanceController::class, 'import'])->name('attendance-records.import');
+    Route::get('/attendance-records/import-status/{batchId}', [\App\Http\Controllers\AttendanceController::class, 'importStatus'])->name('attendance-records.import-status');
+    Route::resource('/attendance-records', \App\Http\Controllers\AttendanceController::class)->except(['show']);
+    Route::resource('/overtime-requests', \App\Http\Controllers\OvertimeRequestController::class)->except(['show']);
 });
