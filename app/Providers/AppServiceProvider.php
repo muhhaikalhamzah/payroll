@@ -23,8 +23,12 @@ class AppServiceProvider extends ServiceProvider
     {
         try {
             $setting = Setting::first();
-            View::share('setting', $setting);
+        } catch (\Exception $e) {
+            $setting = null;
+        }
+        View::share('setting', $setting ?? new Setting());
 
+        try {
             if (!app()->runningInConsole()) {
                 $permissions = \Illuminate\Support\Facades\Cache::remember('permissions_with_roles', now()->addHours(24), function () {
                     return \App\Models\Permission::with('roles')->get();

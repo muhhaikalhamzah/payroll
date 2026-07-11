@@ -18,6 +18,10 @@ class RolePermissionSeeder extends Seeder
             'create-payroll-run', 'approve-payroll-run',
             'submit-leave-request', 'approve-leave-request',
             'view-payslip-own', 'view-payslip-all',
+            'view-departments', 'manage-departments',
+            'view-positions', 'manage-positions',
+            'view-salary-components', 'manage-salary-components',
+            'view-salary-structures', 'manage-salary-structures',
         ];
 
         $permissionModels = [];
@@ -45,6 +49,14 @@ class RolePermissionSeeder extends Seeder
             $permissionModels['create-user']->id,
             $permissionModels['update-user']->id,
             $permissionModels['view-payslip-all']->id,
+            $permissionModels['view-departments']->id,
+            $permissionModels['manage-departments']->id,
+            $permissionModels['view-positions']->id,
+            $permissionModels['manage-positions']->id,
+            $permissionModels['view-salary-components']->id,
+            $permissionModels['manage-salary-components']->id,
+            $permissionModels['view-salary-structures']->id,
+            $permissionModels['manage-salary-structures']->id,
         ]);
 
         // Finance Admin

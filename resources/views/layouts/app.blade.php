@@ -284,6 +284,46 @@
                 </a>
             </li>
 
+            @can('view-departments')
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('departments.*') ? '' : 'collapsed' }}"
+                        href="{{ route('departments.index') }}">
+                        <i class='bx bx-building'></i>
+                        <span>Departments</span>
+                    </a>
+                </li>
+            @endcan
+
+            @can('view-positions')
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('positions.*') ? '' : 'collapsed' }}"
+                        href="{{ route('positions.index') }}">
+                        <i class='bx bx-briefcase'></i>
+                        <span>Positions</span>
+                    </a>
+                </li>
+            @endcan
+
+            @can('view-salary-components')
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('salary-components.*') ? '' : 'collapsed' }}"
+                        href="{{ route('salary-components.index') }}">
+                        <i class='bx bx-list-ul'></i>
+                        <span>Salary Components</span>
+                    </a>
+                </li>
+            @endcan
+
+            @can('view-salary-structures')
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('salary-structures.*') ? '' : 'collapsed' }}"
+                        href="{{ route('salary-structures.index') }}">
+                        <i class='bx bx-money'></i>
+                        <span>Salary Structures</span>
+                    </a>
+                </li>
+            @endcan
+
             @can('view-users')
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('user.*') ? '' : 'collapsed' }}"
