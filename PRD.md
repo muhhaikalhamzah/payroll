@@ -96,6 +96,42 @@ Banyak perusahaan menghadapi inefisiensi dalam mengelola data karyawan, absensi,
 - **Audit Log:** Perekaman aktivitas (User X mengubah Gaji Y pada Waktu Z).
 - **ESS Portal:** Portal karyawan yang *mobile-responsive* (web-based).
 
+### Modul 10: Tunjangan Hari Raya (THR)
+- **Konfigurasi Periode THR:** Pengaturan pencairan THR per tahun yang dapat disesuaikan dengan hari raya keagamaan karyawan (contoh: Idulfitri, Natal) atau diseragamkan di satu periode khusus, sesuai kebijakan perusahaan.
+- **Kalkulasi Otomatis (PP 36/2021):** Perhitungan besaran THR secara sistematis berdasarkan masa kerja (Masa kerja >= 12 bulan = 1 bulan upah; Masa kerja < 12 bulan = dihitung proporsional).
+- **Siklus Pemrosesan Terpisah:** *THR Run* dijalankan terpisah dari *Payroll Run* bulanan (siklus tahunan), sehingga slip gaji THR tidak bercampur dengan slip gaji reguler.
+- **Perhitungan PPh 21 Penghasilan Tidak Teratur:** Sistem memisahkan logika pajak THR dari metode TER bulanan. Pajak THR dihitung menggunakan skema penghasilan disetahunkan dikurangi pajak penghasilan teratur disetahunkan, untuk mencari selisih beban pajak murni dari THR tersebut.
+- **Approval Workflow Terintegrasi:** Alur pengajuan, tinjauan, hingga persetujuan dana THR mengikuti hierarki *state machine* yang identik dengan *payroll* (DRAFT -> PENDING_FINANCE -> APPROVED -> PAID).
+- **Slip THR Khusus:** Men-generate slip penerimaan THR tersendiri secara PDF yang dibagikan terpisah atau *self-service* di portal ESS.
+
+### Modul 11: Pinjaman & Kasbon Karyawan (Employee Loans)
+- **Pengajuan Mandiri (Self-Service):** Karyawan dapat mengajukan pinjaman/kasbon melalui portal ESS dengan mencantumkan nominal yang diajukan, alasan, dan durasi/tenor cicilan yang diinginkan.
+- **Plafon Pinjaman Dinamis:** Konfigurasi batas maksimal peminjaman oleh HR/Finance (misalnya: maksimal 3x gaji pokok, atau maksimal 30% dari Net Take Home Pay) yang divalidasi sistem otomatis saat karyawan men-submit pengajuan.
+- **Approval Workflow (State Machine):** Pengajuan yang masuk tunduk pada alur validasi persetujuan: `DRAFT` -> `PENDING_HR/FINANCE` -> `APPROVED/REJECTED` -> `DISBURSED` (Dana dicairkan).
+- **Skema Cicilan Otomatis (Auto-Deduction):** Sistem secara otomatis menambahkan komponen potongan (deduction) pada *Payroll Run* berjalan senilai cicilan tetap per bulan karyawan bersangkutan. Kolom `remaining_balance` akan berkurang secara otomatis setelah payroll disetujui (status `PAID`).
+- **Validasi Batas Wajar Pemotongan:** Menerapkan *business rule* regulasi yang melarang total potongan gaji (kombinasi BPJS, Pajak, Kasbon, dan Denda) melebihi **50% dari total upah/gaji karyawan**, demi melindungi kelayakan hidup karyawan.
+- **Riwayat & Pelunasan:** Melacak seluruh histori pinjaman yang masih aktif (berjalan) maupun histori pinjaman yang telah lunas secara transparan di panel Karyawan dan Admin.
+
+### Modul 12: Sistem Notifikasi & Pusat Pemberitahuan
+Pusat pemberitahuan (*Notification Center*) didesain secara terpusat agar seluruh komunikasi sistem (persetujuan, peringatan, laporan) ditangani dalam satu antarmuka yang seragam.
+- **Daftar Trigger Notifikasi (Event System):**
+  - *Pengajuan baru (cuti, lembur, pinjaman)* -> Notif ke Approver Terkait (In-App & Email).
+  - *Hasil approval (Disetujui/Ditolak)* -> Notif ke Karyawan Pengaju (In-App & Email).
+  - *Auto-escalate approval tertunda (>3 hari)* -> Notif ke Approver level berikutnya (In-App & Email).
+  - *Payroll / THR run selesai diproses* -> Notif ke Seluruh Karyawan Terkait (In-App).
+  - *Reminder cut-off absensi (H-2)* -> Notif ke Tim HR (In-App & Email).
+  - *Saldo cuti mendekati hangus / kadaluarsa* -> Notif ke Karyawan Terkait (In-App).
+  - *Cicilan pinjaman berhasil dipotong dari gaji* -> Notif ke Karyawan Pengaju (In-App).
+- **Channel Notifikasi & Strategi Pengiriman:**
+  - **In-App Notification**: Notifikasi tersimpan di database dan ditampilkan pada UI *dashboard*.
+  - **Email Notification**: Menggunakan sistem mail existing aplikasi.
+  - **Strategi (*MVP vs Future*)**: Untuk peluncuran versi awal (MVP), sistem In-App cukup mengambil data secara pasif saat user memuat halaman (*page load*) atau melalui *polling HTTP* berkala setiap beberapa menit. Penambahan kapabilitas *real-time broadcast* (menggunakan WebSocket / Laravel Echo) direkomendasikan sebagai peningkatan di fase selanjutnya.
+- **Halaman / UI Pusat Notifikasi:**
+  - **Dropdown Navbar**: Ikon lonceng persisten di sudut kanan atas dengan *badge* angka notifikasi yang belum dibaca.
+  - **Halaman "Semua Notifikasi"**: Menampilkan daftar riwayat notifikasi lengkap didukung fitur filter (Semua / Belum Dibaca / Sudah Dibaca).
+  - **Aksi Cepat & Deep-Linking**: Tersedia tombol "Tandai sudah dibaca". Setiap notifikasi memiliki tautan (*action_url*) yang mengarahkan pengguna tepat ke rekam jejak (*record*) spesifik yang dibahas (misal: langsung ke form persetujuan cuti terkait).
+- **Preferensi Notifikasi (*Nice-to-have* / Opsional):** Menyediakan panel pengaturan (opsional di MVP) di mana pengguna dapat menonaktifkan kiriman email untuk jenis notifikasi tertentu.
+
 ## 6. Business Rules & Formula Perhitungan
 
 - **Urutan Perhitungan (Gross to Net):**
@@ -116,6 +152,23 @@ Banyak perusahaan menghadapi inefisiensi dalam mengelola data karyawan, absensi,
   - Absensi Cut-off: Tgl 21 bln sblmnya - Tgl 20 bln berjalan.
   - Payroll Run & Approval: Tgl 21 - Tgl 24.
   - Payment Release & Payslip: Tgl 25.
+- **Formula Tunjangan Hari Raya (THR):**
+  - Mengacu pada PP 36/2021 dan Permenaker 6/2016.
+  - Dasar upah THR = Gaji Pokok + Tunjangan Tetap.
+  - Masa Kerja >= 12 bulan = `1 x Dasar Upah THR`.
+  - Masa Kerja < 12 bulan = `(Masa Kerja Aktual dalam Bulan / 12) x Dasar Upah THR`.
+- **Perhitungan PPh 21 Non-Reguler (Pajak Atas THR):**
+  - THR dikategorikan sebagai penghasilan tidak teratur sehingga *tidak bisa* langsung dihitung dengan metode TER.
+  - **Formula**:
+    1. Hitung PPh 21 setahun atas Penghasilan Reguler yang disetahunkan (dengan tarif Pasal 17).
+    2. Hitung PPh 21 setahun atas Penghasilan Reguler yang disetahunkan **ditambah** THR (Penghasilan Non-Reguler).
+    3. Selisih dari poin 2 dan poin 1 = Pajak PPh 21 atas THR yang harus dipotong.
+- **Plafon & Batas Maksimal Potongan Pinjaman:**
+  - Batas Plafon Maksimal Pinjaman bersifat *configurable* (contoh bawaan: 3x Dasar Upah).
+  - Sesuai PP 36/2021 Pasal 53 ayat (2), total keseluruhan pemotongan upah (termasuk cicilan pinjaman/kasbon, pajak, iuran BPJS) **tidak boleh melebihi 50% dari total upah bulanan karyawan**. Sistem akan memblokir saat simulasi *payroll run* jika menembus 50%.
+- **Aturan Sistem Notifikasi:**
+  - **Idempotensi (Anti-Duplikasi):** Sistem wajib mencegah pengiriman notifikasi ganda untuk *event* yang persis sama berdasarkan *notifiable_id* dan jenis aktivitas.
+  - **Retensi Data:** Rutin *Scheduler* mingguan akan membersihkan (hard delete) notifikasi in-app yang berumur **lebih dari 90 hari**.
 
 ## 7. Approval Workflow
 
@@ -142,6 +195,11 @@ Banyak perusahaan menghadapi inefisiensi dalam mengelola data karyawan, absensi,
 | View Payslip (Self)     | Read        | Read     | Read          | Read     | Read     |
 | Analytics & Reports     | Read        | Read     | Read          | No Access| No Access|
 | Audit Log               | Read        | No Access| No Access     | No Access| No Access|
+| THR Run (Kalkulasi)     | CRUD        | Create/R | Approve/Exec  | No Access| No Access|
+| Pinjaman Karyawan       | CRUD        | CRUD/App| CRUD/App      | Read (Tim)| C/R (Self) |
+| Notification Center     | R/U (Self)  | R/U (Self)| R/U (Self)   | R/U (Self)| R/U (Self)|
+
+*(Catatan Notifikasi: Asas privasi ketat. Tidak ada role apa pun, termasuk Super Admin, yang diizinkan untuk melihat, membaca, atau menghapus isi notifikasi milik user lain)*.
 
 ## 9. Skema Data & Arsitektur
 
@@ -159,22 +217,24 @@ Banyak perusahaan menghadapi inefisiensi dalam mengelola data karyawan, absensi,
 8. **`salary_structure_components`**: Tabel *mapping* (id, salary_structure_id, component_id, default_amount). Menghubungkan satu struktur gaji dengan beberapa *template* komponen defaultnya.
 9. **`salary_components`**: Master komponen gaji dinamis (id, nama, tipe [allowance/deduction], sifat [fixed/variable], is_taxable).
 10. **`employee_salary_components`**: Nilai aktual/spesifik komponen gaji untuk setiap karyawan secara individual (employee_id, component_id, amount). Berbeda dengan *structure*, tabel ini menyimpan nominal *real* yang diterima karyawan bersangkutan.
-11. **`employee_loans`**: Manajemen potongan cicilan/kasbon/pinjaman (id, employee_id, total_amount, remaining_balance, installment_amount_per_month, start_date, estimated_end_date, status [active/completed]).
-    - Setiap proses *payroll run*, sistem akan otomatis men-*generate* satu baris rincian potongan di `payslip_components` untuk setiap cicilan yang statusnya aktif, lalu mengurangi nilai `remaining_balance` di tabel ini.
+11. **`employee_loans`**: Manajemen pengajuan dan cicilan pinjaman/kasbon (id, employee_id, request_date, total_amount, requested_tenor_months, monthly_installment, remaining_balance, reason, status [DRAFT, PENDING_FINANCE, APPROVED, REJECTED, DISBURSED, COMPLETED], approved_by, approved_at).
+    - Memfasilitasi alur pengajuan mandiri. Saat `status` = DISBURSED, cicilan (`monthly_installment`) mulai dipotong secara otomatis dari payroll bulan berikutnya. Sistem otomatis men-*generate* baris rincian potongan di `payslip_components` untuk setiap cicilan aktif, lalu mengurangi nilai `remaining_balance`.
 12. **`attendance_records`**: Rekaman harian kehadiran (id, employee_id, tanggal, clock_in, clock_out, status_kehadiran, late_minutes).
 13. **`overtime_requests`**: Pengajuan lembur (id, employee_id, attendance_record_id, tanggal, start_time, end_time, multiplier, status_approval).
     - Memiliki *foreign key* `attendance_record_id` yang mereferensi langsung ke `attendance_records.id`. Pengajuan lembur harus divalidasi dan dicocokkan dengan data *clock-in/clock-out* aktual di sistem absensi sebelum bisa disetujui.
 14. **`leave_types`**: Jenis cuti (id, nama, max_days, is_carry_forward).
 15. **`leave_balances`**: Saldo cuti tahun berjalan (employee_id, leave_type_id, year, balance, used).
 16. **`leave_requests`**: Transaksi pengajuan cuti (employee_id, leave_type_id, start_date, end_date, alasan, status_approval).
-17. **`payroll_runs`**: *Header* proses payroll per periode (id, nama_periode, start_date, end_date, status_run, total_gross, total_net).
+17. **`payroll_runs`**: *Header* proses payroll per periode (id, nama_periode, start_date, end_date, status_run, total_gross, total_net, type).
+    - **Terdapat kolom `type`** (enum: `'REGULAR'`, `'THR'`). Fungsionalitas THR disatukan ke `payroll_runs` dan `payslips` menggunakan kolom pembeda `type` karena siklus operasional (DRAFT -> PENDING -> APPROVED -> PAID), skema pencatatan *approval*, distribusi komponen, dan pencetakan PDF **100% sama**, sehingga mencegah redundansi tabel yang masif.
 18. **`payslips`**: Rekaman payslip per karyawan (id, payroll_run_id, employee_id, basic_salary, gross_pay, net_pay).
 19. **`payslip_components`**: Rincian komponen pendapatan dan potongan pada *payslip* (payslip_id, component_id, employee_loan_id, amount).
 20. **`tax_records`**: Rekaman PPh 21 (payslip_id, ptkp_status, pkp_amount, tax_amount).
 21. **`bpjs_records`**: Rekaman potongan BPJS (payslip_id, bpjs_kes_karyawan, bpjs_tk_jht, dll).
 22. **`approvals` & `approval_logs`**: Tabel *polymorphic* untuk mencatat *state approval* (approvable_type, approvable_id, level, approver_id, status).
 23. **`audit_logs`**: Pencatatan aktivitas sistem.
-24. **`notifications`**: Sistem notifikasi in-app.
+24. **`notifications`**: Tabel sistem notifikasi in-app terpusat (id, user_id, title, message, type_category, notifiable_type, notifiable_id, action_url, is_read, read_at).
+    - **Pola Polymorphic**: Penggunaan `notifiable_type` dan `notifiable_id` membuat satu notifikasi dapat melekat fleksibel ke entitas pemicunya (seperti `leave_requests`, `employee_loans`, atau `payroll_runs`). Keputusan arsitektur ini secara sengaja dirancang 100% konsisten dengan pola tabel `approvals` yang sudah ada, guna standarisasi struktur database tanpa harus menambah belasan *foreign key* statis yang NULL.
 
 ### Bagian 2: Visualisasi ERD (Mermaid)
 
@@ -198,8 +258,8 @@ erDiagram
     salary_components ||--o{ employee_salary_components : "defines"
     employees ||--o{ employee_salary_components : "has specific amount"
     
-    employees ||--o{ employee_loans : "has active installments"
-    employee_loans ||--o{ payslip_components : "deducted in"
+    employees ||--o{ employee_loans : "submits request / owes"
+    employee_loans ||--o{ payslip_components : "auto-deducted in"
     
     employees ||--o{ attendance_records : "logs"
     attendance_records ||--o{ overtime_requests : "validates"
@@ -210,8 +270,13 @@ erDiagram
     employees ||--o{ leave_requests : "submits"
     leave_types ||--o{ leave_requests : "is type of"
     
-    payroll_runs ||--o{ payslips : "generates"
-    employees ||--o{ payslips : "receives"
+    payroll_runs {
+        string type "REGULAR | THR"
+        string status
+    }
+    
+    payroll_runs ||--o{ payslips : "generates (Reguler/THR)"
+    employees ||--o{ payslips : "receives slip"
     payslips ||--o{ payslip_components : "contains"
     salary_components ||--o{ payslip_components : "originates from"
     
@@ -219,7 +284,17 @@ erDiagram
     payslips ||--|| bpjs_records : "must have exactly one"
     
     users ||--o{ audit_logs : "performs"
+    
+    notifications {
+        string title
+        string notifiable_type
+        int notifiable_id
+    }
     users ||--o{ notifications : "receives"
+    leave_requests ||--o{ notifications : "triggers (as notifiable)"
+    employee_loans ||--o{ notifications : "triggers (as notifiable)"
+    payroll_runs ||--o{ notifications : "triggers (as notifiable)"
+    
     users ||--o{ approvals : "approves"
 ```
 
@@ -243,10 +318,18 @@ erDiagram
 - Modul *Performance Management* (KPI/OKR) & Rekrutmen (ATS).
 - Integrasi Sistem Akuntansi / ERP via API (misal: Xero, Jurnal, Accurate). Untuk Fase 1, pelaporan akan mengandalkan ekspor laporan CSV/Excel manual yang akan di-input oleh tim Finance.
 - Skema potongan berjenjang dengan perhitungan bunga dinamis (koperasi/kasbon kompleks). Potongan pinjaman/cicilan difokuskan pada tipe *flat/fixed installment* sederhana tanpa bunga.
+- **Bonus Performa / Insentif Non-Rutin**: Distribusi komisi atau insentif akhir tahun yang parameternya sangat fluktuatif belum diakomodasi (hanya mencakup THR reguler).
+- **Reimbursement / Klaim Biaya**: Modul klaim pengeluaran di luar ranah pinjaman (seperti biaya medis / *expense management*).
+- **Pesangon & Uang Pisah (PHK/Resign)**: Perhitungan otomatis hak kompensasi PHK. Untuk sementara dicatat manual sebagai fixed component pada slip terakhir.
 
 ## 13. Roadmap & Fase Pengembangan
-- **Phase 1 (Core HR & Attendance):** Employee data, struktur organisasi, manajemen shift & kehadiran, ESS dasar.
+- **Phase 1 (Core HR & System Foundation):** Employee data, struktur organisasi, manajemen shift & kehadiran, ESS dasar, serta infrastruktur *cross-cutting* (**Sistem Notifikasi & Audit Log**).
 - **Phase 2 (Payroll & Tax Engine):** Struktur gaji, engine perhitungan gaji, PPh 21, BPJS, payslip generation.
-- **Phase 3 (Leave, Overtime & Approval Workflow):** Pengajuan cuti, overtime, kalender cuti, dan engine multi-level approval.
-- **Phase 4 (Reporting & Integrations):** Export e-Bupot, export laporan BPJS, dashboard analitik HR, integrasi API mesin absen.
+- **Phase 3 (Leave, Overtime & Loans):** Pengajuan cuti, overtime, **Modul Pinjaman Karyawan**, dan engine multi-level approval.
+- **Phase 4 (Reporting, Integrations & THR):** Export e-Bupot, export laporan BPJS, dashboard analitik HR, integrasi API mesin absen, dan **Modul THR**.
 - **Phase 5 (Future / Advanced Integrations):** Integrasi *Chart of Accounts* dengan sistem Akuntansi/ERP pihak ketiga via API (Xero, Jurnal, Accurate, dll) dan pemetaan jurnal otomatis.
+
+## 14. Open Questions (Pertanyaan Terbuka untuk Stakeholders)
+1. **Kebijakan Real-Time Notifikasi**: Apakah mekanisme *polling* HTTP per 3-5 menit sudah memuaskan bagi pengguna untuk peluncuran perdana (MVP), ataukah WebSocket mutlak diperlukan sejak hari pertama (*Go-Live*)?
+2. **Kebijakan Retensi Historis**: Mengingat ukuran database, notifikasi dihapus otomatis sesudah 90 hari. Apakah rentang waktu 3 bulan ini dinilai terlalu singkat bagi kebutuhan *tracing* operasional perusahaan?
+3. **Batasan SMTP Email**: Apakah terdapat batasan *rate-limit* pada server email perusahaan yang mengharuskan kita merancang fitur antrean pengiriman (*Throttle Queue*) khusus agar email notifikasi slip gaji tidak ditolak server (bounce)?
