@@ -22,4 +22,17 @@ class PayrollRun extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public static function isLockedByPaid($employeeId, $date)
+    {
+        $month = date('n', strtotime($date));
+        $year = date('Y', strtotime($date));
+        
+        return self::where('status', 'PAID')
+            ->where('period_month', $month)
+            ->where('period_year', $year)
+            ->whereHas('payslips', function($q) use ($employeeId) {
+                $q->where('employee_id', $employeeId);
+            })->exists();
+    }
 }

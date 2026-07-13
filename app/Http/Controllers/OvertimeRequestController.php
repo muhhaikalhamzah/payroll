@@ -77,6 +77,13 @@ class OvertimeRequestController extends Controller
     public function update(Request $request, OvertimeRequest $overtime_request)
     {
         Gate::authorize('update', $overtime_request);
+
+        if (\App\Models\PayrollRun::isLockedByPaid($overtime_request->employee_id, $overtime_request->date)) {
+            $month = date('n', strtotime($overtime_request->date));
+            $year = date('Y', strtotime($overtime_request->date));
+            return back()->with('error', "Data ini tidak bisa diubah karena sudah tercakup dalam payroll yang telah dibayarkan periode {$month}-{$year}");
+        }
+
         $validated = $request->validate([
             'employee_id' => 'required|exists:employees,id',
             'date' => 'required|date',
@@ -131,6 +138,13 @@ class OvertimeRequestController extends Controller
     public function destroy(OvertimeRequest $overtime_request)
     {
         Gate::authorize('delete', $overtime_request);
+
+        if (\App\Models\PayrollRun::isLockedByPaid($overtime_request->employee_id, $overtime_request->date)) {
+            $month = date('n', strtotime($overtime_request->date));
+            $year = date('Y', strtotime($overtime_request->date));
+            return back()->with('error', "Data ini tidak bisa dihapus karena sudah tercakup dalam payroll yang telah dibayarkan periode {$month}-{$year}");
+        }
+
         $overtime_request->delete();
         return redirect()->route('overtime-requests.index')->with('success', 'Overtime request deleted successfully.');
     }

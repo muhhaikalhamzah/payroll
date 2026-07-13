@@ -53,6 +53,13 @@ class AttendanceController extends Controller
     public function update(Request $request, AttendanceRecord $attendance_record)
     {
         Gate::authorize('update', $attendance_record);
+
+        if (\App\Models\PayrollRun::isLockedByPaid($attendance_record->employee_id, $attendance_record->date)) {
+            $month = date('n', strtotime($attendance_record->date));
+            $year = date('Y', strtotime($attendance_record->date));
+            return back()->with('error', "Data ini tidak bisa diubah karena sudah tercakup dalam payroll yang telah dibayarkan periode {$month}-{$year}");
+        }
+
         $validated = $request->validate([
             'employee_id' => 'required|exists:employees,id',
             'date' => 'required|date',
@@ -69,6 +76,13 @@ class AttendanceController extends Controller
     public function destroy(AttendanceRecord $attendance_record)
     {
         Gate::authorize('delete', $attendance_record);
+
+        if (\App\Models\PayrollRun::isLockedByPaid($attendance_record->employee_id, $attendance_record->date)) {
+            $month = date('n', strtotime($attendance_record->date));
+            $year = date('Y', strtotime($attendance_record->date));
+            return back()->with('error', "Data ini tidak bisa dihapus karena sudah tercakup dalam payroll yang telah dibayarkan periode {$month}-{$year}");
+        }
+
         $attendance_record->delete();
         return redirect()->route('attendance-records.index')->with('success', 'Attendance record deleted successfully.');
     }

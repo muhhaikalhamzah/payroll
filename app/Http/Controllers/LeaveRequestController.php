@@ -66,6 +66,13 @@ class LeaveRequestController extends Controller
             abort(403, 'Unauthorized.');
         }
 
+        if (\App\Models\PayrollRun::isLockedByPaid($employee->id, $validated['start_date']) || 
+            \App\Models\PayrollRun::isLockedByPaid($employee->id, $validated['end_date'])) {
+            $month = date('n', strtotime($validated['start_date']));
+            $year = date('Y', strtotime($validated['start_date']));
+            return back()->withInput()->with('error', "Data ini tidak bisa ditambahkan karena sudah tercakup dalam payroll yang telah dibayarkan periode {$month}-{$year}");
+        }
+
         $duration = Carbon::parse($validated['start_date'])->diffInDaysFiltered(function(Carbon $date) {
             return !$date->isWeekend();
         }, Carbon::parse($validated['end_date'])) + 1;
@@ -130,6 +137,14 @@ class LeaveRequestController extends Controller
         if ($leaveRequest->employee->user_id !== auth()->id()) {
             abort(403);
         }
+
+        if (\App\Models\PayrollRun::isLockedByPaid($leaveRequest->employee_id, $leaveRequest->start_date) || 
+            \App\Models\PayrollRun::isLockedByPaid($leaveRequest->employee_id, $leaveRequest->end_date)) {
+            $month = date('n', strtotime($leaveRequest->start_date));
+            $year = date('Y', strtotime($leaveRequest->start_date));
+            return back()->with('error', "Data ini tidak bisa dihapus karena sudah tercakup dalam payroll yang telah dibayarkan periode {$month}-{$year}");
+        }
+
         if ($leaveRequest->status !== 'DRAFT') {
             return back()->with('error', 'Only DRAFT requests can be deleted.');
         }
