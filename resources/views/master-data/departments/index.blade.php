@@ -54,7 +54,7 @@
                             <td>{{ $item->parent->name ?? '-' }}</td>
                             @can('manage-departments')
                             <td>
-                                <div class="btn-group">
+                                <div class="d-flex gap-1">
                                     <a href="{{ route('departments.edit', $item) }}" class="btn btn-warning btn-sm">
                                         <i class="bi bi-pencil"></i>
                                     </a>

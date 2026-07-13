@@ -62,22 +62,24 @@
                                     <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill">Resigned</span>
                                 @endif
                             </td>
-                            <td class="px-4 py-3 text-end">
-                                <a href="{{ route('employees.show', $employee) }}" class="btn btn-sm btn-outline-info me-1">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                @can('manage-employees')
-                                <a href="{{ route('employees.edit', $employee) }}" class="btn btn-sm btn-outline-primary me-1">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <form action="{{ route('employees.destroy', $employee) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to archive this employee?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                                @endcan
+                            <td class="px-4 py-3">
+                                <div class="d-flex justify-content-end gap-1">
+                                    <a href="{{ route('employees.show', $employee) }}" class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    @can('manage-employees')
+                                    <a href="{{ route('employees.edit', $employee) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form action="{{ route('employees.destroy', $employee) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to archive this employee?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                    @endcan
+                                </div>
                             </td>
                         </tr>
                         @empty

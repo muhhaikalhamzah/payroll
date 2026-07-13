@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
             SettingSeeder::class,
             MasterDataSeeder::class,
             EmployeeSeeder::class,
+            AttendanceOvertimeSeeder::class,
+            PayrollSeeder::class,
         ]);
     }
 }

@@ -53,6 +53,8 @@ Route::middleware('auth')->group(function () {
     // Payroll Calculation & Generation
     Route::resource('/payroll-runs', \App\Http\Controllers\PayrollRunController::class)->only(['index', 'create', 'store', 'show']);
     Route::get('/payslips/{payslip}', [\App\Http\Controllers\PayslipController::class, 'show'])->name('payslips.show');
+    Route::get('/payslips/{payslip}/pdf', [\App\Http\Controllers\PayslipController::class, 'showPdf'])->name('payslips.pdf');
+    Route::get('/reports/payroll-runs/{payrollRun}/ebupot', [\App\Http\Controllers\ReportController::class, 'exportEBupot'])->name('payroll-runs.ebupot');
 
     // Generic Approvals
     Route::post('/approvals/{type}/{id}/submit', [\App\Http\Controllers\ApprovalController::class, 'submit'])->name('approvals.submit');

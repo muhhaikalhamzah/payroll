@@ -55,9 +55,11 @@
                         <span class="badge bg-success">PAID</span>
                     @endif
                 </td>
-                <td>{{ $run->creator->first_name }} {{ $run->creator->last_name }}</td>
+                <td>{{ $run->creator->name ?? '-' }}</td>
                 <td>
-                  <a href="{{ route('payroll-runs.show', $run->id) }}" class="btn btn-sm btn-info text-white"><i class="bi bi-eye"></i> View Details</a>
+                  <div class="d-flex gap-1">
+                    <a href="{{ route('payroll-runs.show', $run->id) }}" class="btn btn-sm btn-info text-white"><i class="bi bi-eye"></i> View Details</a>
+                  </div>
                 </td>
               </tr>
               @empty

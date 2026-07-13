@@ -26,7 +26,8 @@ class RolePermissionSeeder extends Seeder
             'view-attendances', 'manage-attendances', 'import-attendances',
             'view-overtime-requests', 'submit-overtime-requests', 'approve-overtime-requests', 'manage-overtime-requests',
             'manage-employee-loans',
-            'submit-payroll-runs', 'approve-payroll-runs', 'reject-payroll-runs', 'mark-payroll-runs-paid'
+            'submit-payroll-runs', 'approve-payroll-runs', 'reject-payroll-runs', 'mark-payroll-runs-paid',
+            'export-reports', 'view-dashboard-analytics'
         ];
 
         $permissionModels = [];
@@ -76,6 +77,8 @@ class RolePermissionSeeder extends Seeder
             $permissionModels['create-payroll-runs']->id,
             $permissionModels['submit-payroll-runs']->id,
             $permissionModels['manage-employee-loans']->id,
+            $permissionModels['export-reports']->id,
+            $permissionModels['view-dashboard-analytics']->id,
         ]);
 
         // Finance Admin
@@ -86,6 +89,8 @@ class RolePermissionSeeder extends Seeder
             $permissionModels['reject-payroll-runs']->id,
             $permissionModels['mark-payroll-runs-paid']->id,
             $permissionModels['view-payslip-all']->id,
+            $permissionModels['export-reports']->id,
+            $permissionModels['view-dashboard-analytics']->id,
         ]);
 
         // Manager
@@ -95,6 +100,7 @@ class RolePermissionSeeder extends Seeder
             $permissionModels['view-attendances']->id,
             $permissionModels['view-overtime-requests']->id,
             $permissionModels['approve-overtime-requests']->id,
+            $permissionModels['view-dashboard-analytics']->id,
         ]);
 
         // Employee

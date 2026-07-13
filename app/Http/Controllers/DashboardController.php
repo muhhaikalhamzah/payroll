@@ -19,11 +19,30 @@ class DashboardController extends Controller
             $q->whereIn('slug', ['hr-admin', 'finance-admin']);
         })->count();
 
+        $payrollTrend = \App\Models\PayrollRun::with('payslips')
+            ->whereIn('status', ['PAID', 'COMPLETED'])
+            ->orderBy('period_year', 'desc')
+            ->orderBy('period_month', 'desc')
+            ->take(6)
+            ->get()
+            ->reverse();
+
+        $chartLabels = [];
+        $chartData = [];
+
+        foreach ($payrollTrend as $run) {
+            $monthName = date("M", mktime(0, 0, 0, $run->period_month, 1));
+            $chartLabels[] = $monthName . ' ' . $run->period_year;
+            $chartData[] = $run->payslips->sum('net_pay');
+        }
+
         return view('dashboard.index', [
             'title' => 'Dashboard',
             'totalUsers' => $totalUsers,
             'superadminCount' => $superadminCount,
             'adminCount' => $adminCount,
+            'chartLabels' => $chartLabels,
+            'chartData' => $chartData,
         ]);
     }
 

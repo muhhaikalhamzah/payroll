@@ -52,7 +52,7 @@
                             <td>{{ $item->department->name ?? '-' }}</td>
                             @can('manage-positions')
                             <td>
-                                <div class="btn-group">
+                                <div class="d-flex gap-1">
                                     <a href="{{ route('positions.edit', $item) }}" class="btn btn-warning btn-sm">
                                         <i class="bi bi-pencil"></i>
                                     </a>

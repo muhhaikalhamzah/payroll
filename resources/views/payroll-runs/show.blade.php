@@ -46,6 +46,11 @@
                     @endcan
                 @endif
                 <span class="badge bg-secondary d-flex align-items-center px-3 fs-6">{{ $payroll_run->status }}</span>
+                @if(in_array($payroll_run->status, ['PAID', 'COMPLETED']))
+                    @can('export-reports')
+                    <a href="{{ route('payroll-runs.ebupot', $payroll_run->id) }}" class="btn btn-warning"><i class="bi bi-file-earmark-spreadsheet"></i> e-Bupot</a>
+                    @endcan
+                @endif
             </div>
           </div>
           
@@ -69,7 +74,9 @@
                 <td>Rp {{ number_format($payslip->total_deductions, 0, ',', '.') }}</td>
                 <td class="fw-bold text-success">Rp {{ number_format($payslip->net_pay, 0, ',', '.') }}</td>
                 <td>
-                  <a href="{{ route('payslips.show', $payslip->id) }}" class="btn btn-sm btn-info text-white"><i class="bi bi-file-earmark-text"></i> Slip</a>
+                  <div class="d-flex gap-1">
+                    <a href="{{ route('payslips.show', $payslip->id) }}" class="btn btn-sm btn-info text-white"><i class="bi bi-file-earmark-text"></i> Slip</a>
+                  </div>
                 </td>
               </tr>
               @endforeach

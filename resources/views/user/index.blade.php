@@ -29,17 +29,19 @@
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->role?->name }}</td>
                             <td>
-                                <button type="button" class="btn btn-info btn-sm btn-detail"
-                                    data-route="{{ route('user.show', $user) }}">
-                                    <i class='bx bx-show'></i>
-                                </button>
-                                <a href="{{ route('user.edit', $user) }}" class="btn btn-warning btn-sm">
-                                    <i class='bx bx-edit-alt'></i>
-                                </a>
-                                <button type="button" class="btn btn-danger btn-sm btn-delete" data-bs-toggle="modal"
-                                    data-bs-target="#deleteModal" data-route="{{ route('user.destroy', $user) }}">
-                                    <i class='bx bx-trash'></i>
-                                </button>
+                                <div class="d-flex justify-content-center gap-1">
+                                    <button type="button" class="btn btn-info btn-sm btn-detail"
+                                        data-route="{{ route('user.show', $user) }}">
+                                        <i class='bx bx-show'></i>
+                                    </button>
+                                    <a href="{{ route('user.edit', $user) }}" class="btn btn-warning btn-sm">
+                                        <i class='bx bx-edit-alt'></i>
+                                    </a>
+                                    <button type="button" class="btn btn-danger btn-sm btn-delete" data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal" data-route="{{ route('user.destroy', $user) }}">
+                                        <i class='bx bx-trash'></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     @endforeach

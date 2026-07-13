@@ -66,8 +66,11 @@
               </div>
           </div>
           
-          <div class="text-center mt-4">
+          <div class="text-center mt-4 d-flex justify-content-center gap-2">
               <button onclick="window.print()" class="btn btn-secondary"><i class="bi bi-printer"></i> Print</button>
+              @if(in_array($payslip->payrollRun->status, ['PAID', 'COMPLETED']))
+                  <a href="{{ route('payslips.pdf', $payslip->id) }}" class="btn btn-primary"><i class="bi bi-file-earmark-pdf"></i> Download PDF</a>
+              @endif
           </div>
         </div>
       </div>

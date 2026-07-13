@@ -13,7 +13,7 @@ class PayslipPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermission('view-payroll-runs');
+        return $user->hasPermission('view-payslip-all');
     }
 
     /**
@@ -21,7 +21,7 @@ class PayslipPolicy
      */
     public function view(User $user, Payslip $payslip): bool
     {
-        if ($user->hasPermission('view-payroll-runs')) {
+        if ($user->hasPermission('view-payslip-all')) {
             return true;
         }
 

@@ -97,6 +97,25 @@
         </div>
     </div>
 
+    </div>
+
+    <!-- Payroll Trend Chart -->
+    @can('view-dashboard-analytics')
+    @if(isset($chartLabels) && count($chartLabels) > 0)
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white border-bottom">
+            <h5 class="mb-0 fw-bold">
+                <i class='bx bx-line-chart me-2 text-primary'></i>
+                Payroll Trend (Last 6 Months)
+            </h5>
+        </div>
+        <div class="card-body">
+            <canvas id="payrollTrendChart" style="max-height: 300px;"></canvas>
+        </div>
+    </div>
+    @endif
+    @endcan
+
     <!-- Quick Actions -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-white border-bottom">
@@ -213,6 +232,38 @@
     @endpush
 
     @push('scripts')
+    @can('view-dashboard-analytics')
+    @if(isset($chartLabels) && count($chartLabels) > 0)
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            new Chart(document.querySelector('#payrollTrendChart'), {
+                type: 'line',
+                data: {
+                    labels: {!! json_encode($chartLabels) !!},
+                    datasets: [{
+                        label: 'Total Net Pay (Rp)',
+                        data: {!! json_encode($chartData) !!},
+                        fill: true,
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+    @endif
+    @endcan
     @endpush
 
 </x-app>

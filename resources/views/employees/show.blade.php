@@ -160,18 +160,20 @@
                                             </td>
                                             @can('manage-bank-accounts')
                                             <td class="text-end">
-                                                <button class="btn btn-sm btn-outline-primary me-1" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#editBankModal{{ $account->id }}">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <form action="{{ route('employees.bank-accounts.destroy', [$employee, $account]) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this bank account?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                        <i class="bi bi-trash"></i>
+                                                <div class="d-flex justify-content-end gap-1">
+                                                    <button class="btn btn-sm btn-outline-primary" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#editBankModal{{ $account->id }}">
+                                                        <i class="bi bi-pencil"></i>
                                                     </button>
-                                                </form>
+                                                    <form action="{{ route('employees.bank-accounts.destroy', [$employee, $account]) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this bank account?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
 
                                                 <!-- Edit Bank Modal -->
                                                 <div class="modal fade" id="editBankModal{{ $account->id }}" tabindex="-1" aria-hidden="true">

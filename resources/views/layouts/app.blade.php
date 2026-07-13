@@ -315,25 +315,7 @@
                 </li>
             @endcan
 
-            @can('view-attendances')
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('attendance-records.*') ? '' : 'collapsed' }}"
-                        href="{{ route('attendance-records.index') }}">
-                        <i class='bx bx-check-circle'></i>
-                        <span>Attendance</span>
-                    </a>
-                </li>
-            @endcan
 
-            @can('view-overtime-requests')
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('overtime-requests.*') ? '' : 'collapsed' }}"
-                        href="{{ route('overtime-requests.index') }}">
-                        <i class='bx bx-time'></i>
-                        <span>Overtime</span>
-                    </a>
-                </li>
-            @endcan
 
             @can('view-departments')
                 <li class="nav-item">

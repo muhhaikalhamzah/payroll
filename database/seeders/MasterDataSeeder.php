@@ -12,11 +12,11 @@ class MasterDataSeeder extends Seeder
      */
     public function run(): void
     {
-        $hr = \App\Models\Department::create(['name' => 'Human Resources']);
-        $engineering = \App\Models\Department::create(['name' => 'Engineering']);
+        $hr = \App\Models\Department::create(['name' => 'Human Resources', 'description' => 'Handles employee relations, payroll, and benefits.']);
+        $engineering = \App\Models\Department::create(['name' => 'Engineering', 'description' => 'Develops and maintains company software products.']);
         
-        $backend = \App\Models\Department::create(['name' => 'Backend', 'parent_department_id' => $engineering->id]);
-        $frontend = \App\Models\Department::create(['name' => 'Frontend', 'parent_department_id' => $engineering->id]);
+        $backend = \App\Models\Department::create(['name' => 'Backend', 'parent_department_id' => $engineering->id, 'description' => 'Focuses on server-side logic and database integration.']);
+        $frontend = \App\Models\Department::create(['name' => 'Frontend', 'parent_department_id' => $engineering->id, 'description' => 'Focuses on user interfaces and client-side logic.']);
 
         $hrManager = \App\Models\Position::create(['department_id' => $hr->id, 'name' => 'HR Manager']);
         $backendDev = \App\Models\Position::create(['department_id' => $backend->id, 'name' => 'Backend Developer']);

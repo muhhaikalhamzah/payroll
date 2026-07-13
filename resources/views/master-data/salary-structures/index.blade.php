@@ -54,7 +54,7 @@
                             <td>Rp {{ number_format($item->base_salary, 2, ',', '.') }}</td>
                             @can('manage-salary-structures')
                             <td>
-                                <div class="btn-group">
+                                <div class="d-flex gap-1">
                                     <a href="{{ route('salary-structures.edit', $item) }}" class="btn btn-warning btn-sm">
                                         <i class="bi bi-pencil"></i>
                                     </a>

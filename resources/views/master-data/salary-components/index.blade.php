@@ -56,7 +56,7 @@
                             <td>{{ $item->is_taxable ? 'Yes' : 'No' }}</td>
                             @can('manage-salary-components')
                             <td>
-                                <div class="btn-group">
+                                <div class="d-flex gap-1">
                                     <a href="{{ route('salary-components.edit', $item) }}" class="btn btn-warning btn-sm">
                                         <i class="bi bi-pencil"></i>
                                     </a>
