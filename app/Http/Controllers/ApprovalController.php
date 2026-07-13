@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\PayrollRun;
+use App\Models\LeaveRequest;
 use Illuminate\Support\Facades\Gate;
 
 class ApprovalController extends Controller
@@ -13,6 +14,8 @@ class ApprovalController extends Controller
     {
         if ($type === 'payroll_run') {
             return PayrollRun::findOrFail($id);
+        } elseif ($type === 'leave_request') {
+            return LeaveRequest::findOrFail($id);
         }
         abort(404, 'Unknown approvable type');
     }
@@ -23,6 +26,12 @@ class ApprovalController extends Controller
 
         if ($type === 'payroll_run') {
             Gate::authorize('submit-payroll-runs');
+        } elseif ($type === 'leave_request') {
+            Gate::authorize('submit-leave-requests');
+            // Employee can only submit their own
+            if ($model->employee->user_id !== auth()->id()) {
+                abort(403, 'Unauthorized action.');
+            }
         }
 
         $request->validate([
@@ -32,6 +41,8 @@ class ApprovalController extends Controller
         try {
             DB::beginTransaction();
 
+            $status = 'PENDING_FINANCE'; // default
+
             // Pessimistic locking to prevent race condition
             if ($type === 'payroll_run') {
                 $model = PayrollRun::where('id', $id)->lockForUpdate()->firstOrFail();
@@ -40,9 +51,17 @@ class ApprovalController extends Controller
                 }
                 $model->status = 'PENDING_FINANCE';
                 $model->save();
+            } elseif ($type === 'leave_request') {
+                $model = LeaveRequest::where('id', $id)->lockForUpdate()->firstOrFail();
+                if ($model->status !== 'DRAFT') {
+                    throw new \Exception('Only DRAFT can be submitted.');
+                }
+                $model->status = 'PENDING_MANAGER';
+                $model->save();
+                $status = 'PENDING_MANAGER';
             }
 
-            $model->submitForApproval($request->notes);
+            $model->submitForApproval($request->notes, $status);
 
             DB::commit();
 
@@ -59,6 +78,8 @@ class ApprovalController extends Controller
 
         if ($type === 'payroll_run') {
             Gate::authorize('approve-payroll-runs');
+        } elseif ($type === 'leave_request') {
+            Gate::authorize('approve-leave-requests');
         }
 
         $request->validate([
@@ -68,6 +89,8 @@ class ApprovalController extends Controller
         try {
             DB::beginTransaction();
 
+            $status = 'APPROVED'; // default
+
             if ($type === 'payroll_run') {
                 $model = PayrollRun::where('id', $id)->lockForUpdate()->firstOrFail();
                 if ($model->status !== 'PENDING_FINANCE') {
@@ -75,9 +98,37 @@ class ApprovalController extends Controller
                 }
                 $model->status = 'APPROVED';
                 $model->save();
+            } elseif ($type === 'leave_request') {
+                $model = LeaveRequest::where('id', $id)->lockForUpdate()->firstOrFail();
+                if ($model->status === 'PENDING_MANAGER') {
+                    $model->status = 'PENDING_HR';
+                    $status = 'PENDING_HR';
+                } elseif ($model->status === 'PENDING_HR') {
+                    $model->status = 'APPROVED';
+                    $status = 'APPROVED';
+
+                    // Deduction logic
+                    $duration = \Carbon\Carbon::parse($model->start_date)->diffInDaysFiltered(function(\Carbon\Carbon $date) {
+                        return !$date->isWeekend();
+                    }, \Carbon\Carbon::parse($model->end_date)) + 1;
+
+                    $balance = \App\Models\LeaveBalance::where('employee_id', $model->employee_id)
+                        ->where('leave_type_id', $model->leave_type_id)
+                        ->where('year', date('Y', strtotime($model->start_date)))
+                        ->lockForUpdate()
+                        ->first();
+                    
+                    if ($balance) {
+                        $balance->used += $duration;
+                        $balance->save();
+                    }
+                } else {
+                    throw new \Exception('Invalid status for approval.');
+                }
+                $model->save();
             }
 
-            $model->approveApproval(null, $request->comments);
+            $model->approveApproval(null, $request->comments, $status);
 
             DB::commit();
 
@@ -94,6 +145,8 @@ class ApprovalController extends Controller
 
         if ($type === 'payroll_run') {
             Gate::authorize('reject-payroll-runs');
+        } elseif ($type === 'leave_request') {
+            Gate::authorize('approve-leave-requests');
         }
 
         $request->validate([
@@ -109,6 +162,13 @@ class ApprovalController extends Controller
                     throw new \Exception('Only PENDING_FINANCE can be rejected.');
                 }
                 $model->status = 'DRAFT'; // go back to draft if rejected
+                $model->save();
+            } elseif ($type === 'leave_request') {
+                $model = LeaveRequest::where('id', $id)->lockForUpdate()->firstOrFail();
+                if (!in_array($model->status, ['PENDING_MANAGER', 'PENDING_HR'])) {
+                    throw new \Exception('Only pending requests can be rejected.');
+                }
+                $model->status = 'REJECTED';
                 $model->save();
             }
 

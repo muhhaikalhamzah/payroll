@@ -17,10 +17,10 @@ trait Approvable
         return $this->morphOne(Approval::class, 'approvable')->latestOfMany();
     }
 
-    public function submitForApproval($notes = null)
+    public function submitForApproval($notes = null, $status = 'PENDING_FINANCE')
     {
         $approval = $this->approvals()->create([
-            'status' => 'PENDING_FINANCE',
+            'status' => $status,
             'notes' => $notes,
         ]);
 
@@ -33,13 +33,13 @@ trait Approvable
         return $approval;
     }
 
-    public function approveApproval($approvalId = null, $comments = null)
+    public function approveApproval($approvalId = null, $comments = null, $status = 'APPROVED')
     {
         $approval = $approvalId ? $this->approvals()->find($approvalId) : $this->latestApproval;
         
         if ($approval) {
             $approval->update([
-                'status' => 'APPROVED',
+                'status' => $status,
                 'approver_id' => Auth::id(),
             ]);
 
@@ -52,13 +52,13 @@ trait Approvable
         return $approval;
     }
 
-    public function rejectApproval($approvalId = null, $comments = null)
+    public function rejectApproval($approvalId = null, $comments = null, $status = 'REJECTED')
     {
         $approval = $approvalId ? $this->approvals()->find($approvalId) : $this->latestApproval;
         
         if ($approval) {
             $approval->update([
-                'status' => 'REJECTED',
+                'status' => $status,
                 'approver_id' => Auth::id(),
             ]);
 

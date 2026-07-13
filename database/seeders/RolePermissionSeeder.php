@@ -27,7 +27,14 @@ class RolePermissionSeeder extends Seeder
             'view-overtime-requests', 'submit-overtime-requests', 'approve-overtime-requests', 'manage-overtime-requests',
             'manage-employee-loans',
             'submit-payroll-runs', 'approve-payroll-runs', 'reject-payroll-runs', 'mark-payroll-runs-paid',
-            'export-reports', 'view-dashboard-analytics'
+            'export-reports', 'view-dashboard-analytics',
+            
+            // Leave Management (New)
+            'manage-leave-types',
+            'manage-leave-balances',
+            'view-leave-requests',
+            'submit-leave-requests',
+            'approve-leave-requests',
         ];
 
         $permissionModels = [];
@@ -79,6 +86,11 @@ class RolePermissionSeeder extends Seeder
             $permissionModels['manage-employee-loans']->id,
             $permissionModels['export-reports']->id,
             $permissionModels['view-dashboard-analytics']->id,
+            // Leave Management
+            $permissionModels['manage-leave-types']->id,
+            $permissionModels['manage-leave-balances']->id,
+            $permissionModels['view-leave-requests']->id,
+            $permissionModels['approve-leave-requests']->id,
         ]);
 
         // Finance Admin
@@ -95,7 +107,8 @@ class RolePermissionSeeder extends Seeder
 
         // Manager
         $manager->permissions()->syncWithoutDetaching([
-            $permissionModels['approve-leave-request']->id,
+            $permissionModels['view-leave-requests']->id,
+            $permissionModels['approve-leave-requests']->id,
             $permissionModels['view-payslip-own']->id,
             $permissionModels['view-attendances']->id,
             $permissionModels['view-overtime-requests']->id,
@@ -105,7 +118,8 @@ class RolePermissionSeeder extends Seeder
 
         // Employee
         $employee->permissions()->syncWithoutDetaching([
-            $permissionModels['submit-leave-request']->id,
+            $permissionModels['view-leave-requests']->id,
+            $permissionModels['submit-leave-requests']->id,
             $permissionModels['view-payslip-own']->id,
             $permissionModels['view-attendances']->id,
             $permissionModels['view-overtime-requests']->id,

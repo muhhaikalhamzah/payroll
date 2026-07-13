@@ -34,6 +34,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('/positions', PositionController::class)->except(['show']);
     Route::resource('/salary-components', SalaryComponentController::class)->except(['show']);
     Route::resource('/salary-structures', SalaryStructureController::class)->except(['show']);
+    Route::resource('/leave-types', \App\Http\Controllers\LeaveTypeController::class)->except(['show']);
     
     // Employee Data Management
     Route::resource('/employees', \App\Http\Controllers\EmployeeController::class);
@@ -42,6 +43,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/employees/{employee}/bank-accounts/{bank_account}', [\App\Http\Controllers\EmployeeBankAccountController::class, 'destroy'])->name('employees.bank-accounts.destroy');
 
     Route::resource('/setting', SettingController::class)->only(['index', 'update']); // Simplified Setting route
+
+    // Leave Management
+    Route::resource('/leave-balances', \App\Http\Controllers\LeaveBalanceController::class)->except(['show']);
+    Route::resource('/leave-requests', \App\Http\Controllers\LeaveRequestController::class)->except(['show', 'edit', 'update']);
 
     // Attendance and Overtime
     Route::get('/attendance-records/import', [\App\Http\Controllers\AttendanceController::class, 'importForm'])->name('attendance-records.import-form');

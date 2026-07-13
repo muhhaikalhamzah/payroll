@@ -315,6 +315,36 @@
                 </li>
             @endcan
 
+            @can('view-leave-requests')
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('leave-requests.*') ? '' : 'collapsed' }}"
+                        href="{{ route('leave-requests.index') }}">
+                        <i class='bx bx-calendar-event'></i>
+                        <span>Leave Requests</span>
+                    </a>
+                </li>
+            @endcan
+
+            @can('manage-leave-balances')
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('leave-balances.*') ? '' : 'collapsed' }}"
+                        href="{{ route('leave-balances.index') }}">
+                        <i class='bx bx-calendar-check'></i>
+                        <span>Leave Balances</span>
+                    </a>
+                </li>
+            @endcan
+
+            @can('manage-leave-types')
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('leave-types.*') ? '' : 'collapsed' }}"
+                        href="{{ route('leave-types.index') }}">
+                        <i class='bx bx-calendar-star'></i>
+                        <span>Leave Types</span>
+                    </a>
+                </li>
+            @endcan
+
 
 
             @can('view-departments')
