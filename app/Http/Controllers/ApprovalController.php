@@ -323,11 +323,16 @@ class ApprovalController extends Controller
                     $payslip->status = 'FINAL';
                     $payslip->save();
 
-                    // Bug 1: Send notification for regular payroll run
-                    if ($model->type !== 'THR' && $payslip->employee && $payslip->employee->user) {
+                    // Bug 1 & 1b: Send notification for payroll run
+                    if ($payslip->employee && $payslip->employee->user) {
                         $period = \Carbon\Carbon::createFromDate($model->period_year, $model->period_month, 1)->format('F Y');
-                        $title = "Payslip Available";
-                        $message = "Your payslip for " . $period . " is now available. Click here to view it.";
+                        if ($model->type === 'THR') {
+                            $title = "THR Payslip Available";
+                            $message = "Your THR payslip for " . $period . " is now available. Click here to view it.";
+                        } else {
+                            $title = "Payslip Available";
+                            $message = "Your payslip for " . $period . " is now available. Click here to view it.";
+                        }
                         
                         $payslip->employee->user->notify(new \App\Notifications\StatusChangedNotification(
                             $title,
