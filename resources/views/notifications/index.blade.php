@@ -29,7 +29,10 @@
                                 @endif
                             </div>
                         @empty
-                            <div class="text-center p-3 text-muted">No notifications found.</div>
+                            <x-empty-state 
+                                title="No Notifications" 
+                                description="You're all caught up! There are no new notifications for you." 
+                            />
                         @endforelse
                     </div>
                     

@@ -29,6 +29,13 @@
           </div>
           @endif
 
+          @if($leaveRequests->isEmpty())
+            <x-empty-state 
+                title="No Leave Requests" 
+                description="There are no leave requests found." 
+                icon='<i class="bi bi-calendar-x fs-1 text-secondary"></i>' 
+            />
+          @else
           <table class="table table-hover datatable">
             <thead>
               <tr>
@@ -98,6 +105,7 @@
               @endforeach
             </tbody>
           </table>
+          @endif
         </div>
       </div>
     </div>

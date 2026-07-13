@@ -24,6 +24,13 @@
 
     <div class="card shadow-sm border-0">
         <div class="card-body p-4">
+            @if(isset($overtime_requests) && $overtime_requests->isEmpty())
+                <x-empty-state 
+                    title="No Overtime Requests" 
+                    description="There are no overtime requests found." 
+                    icon='<i class="bi bi-clock-history fs-1 text-secondary"></i>' 
+                />
+            @else
             <div class="table-responsive">
                 <table id="data-table" class="table table-hover table-striped align-middle" style="width:100%">
                     <thead>
@@ -74,6 +81,7 @@
                     </tbody>
                 </table>
             </div>
+            @endif
         </div>
     </div>
 
