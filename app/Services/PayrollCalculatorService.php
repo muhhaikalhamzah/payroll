@@ -56,19 +56,25 @@ class PayrollCalculatorService
         }
 
         // 3. Overtime calculation
-        $overtimeRequests = OvertimeRequest::where('employee_id', $employee->id)
+        $overtimeRequests = \App\Models\OvertimeRequest::where('employee_id', $employee->id)
             ->whereMonth('date', $month)
             ->whereYear('date', $year)
             ->where('status', 'APPROVED')
             ->get();
 
-        $totalOvertimeMinutes = $overtimeRequests->sum('duration_minutes');
-        $overtimeHours = $totalOvertimeMinutes / 60;
-        $overtimePay = $overtimeHours * (1 / 173) * $basicSalary;
+        $overtimePay = 0;
+        $overtimeService = new \App\Services\OvertimeCalculatorService();
+        
+        foreach ($overtimeRequests as $request) {
+            $hours = floor($request->duration_minutes / 60);
+            if ($hours > 0) {
+                $overtimePay += $overtimeService->calculateOvertimeRate($employee, Carbon::parse($request->date), $hours);
+            }
+        }
         
         if ($overtimePay > 0) {
             $allowances[] = [
-                'name' => 'Overtime Pay',
+                'name' => 'Uang Lembur',
                 'amount' => $overtimePay,
             ];
         }
