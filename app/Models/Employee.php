@@ -53,4 +53,9 @@ class Employee extends Model
     {
         return $this->hasMany(Payslip::class);
     }
+
+    public function getPtkpStatusAttribute()
+    {
+        return $this->marital_status . '/' . $this->dependents_count;
+    }
 }

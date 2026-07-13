@@ -137,20 +137,19 @@ class PayrollCalculatorService
         $deductions[] = ['name' => 'BPJS JP (1%)', 'amount' => $jpEmployee];
         $deductions[] = ['name' => 'BPJS Kesehatan (1%)', 'amount' => $kesEmployee];
 
-        // 7. PPh 21 (TER logic)
-        $taxStatus = $employee->tax_status ?? 'TK/0';
-        $terCategory = config("payroll.ter_categories.{$taxStatus}", 'A');
-        $terRates = config("payroll.ter_rates.{$terCategory}", []);
+        // 7. PPh 21 (TER logic & Pasal 17)
+        $taxService = new \App\Services\PPh21CalculatorService();
+        $terCategory = $taxService->getTerCategory($employee);
 
-        $pph21Rate = 0;
-        foreach ($terRates as $rateTier) {
-            if ($grossPay <= $rateTier[0]) {
-                $pph21Rate = $rateTier[1];
-                break;
-            }
+        // Check if this is December Payroll Run
+        // Note: The signature for calculate doesn't explicitly pass PayrollRun, 
+        // but it has $month and $year.
+        if ($month == 12) {
+            $totalJhtJp = $jhtEmployee + $jpEmployee;
+            $pph21Amount = $taxService->calculateDecemberReconciliation($employee, $year, $grossPay, $totalJhtJp);
+        } else {
+            $pph21Amount = $taxService->calculateMonthlyTER($employee, $grossPay);
         }
-        
-        $pph21Amount = max(0, $grossPay * $pph21Rate);
 
         $taxRecord = [
             'ter_category' => $terCategory,
@@ -160,6 +159,9 @@ class PayrollCalculatorService
         
         if ($pph21Amount > 0) {
             $deductions[] = ['name' => 'PPh 21', 'amount' => $pph21Amount];
+        } else if ($pph21Amount < 0) {
+            // Lebih bayar, treated as allowance
+            $allowances[] = ['name' => 'Kelebihan Potong PPh 21', 'amount' => abs($pph21Amount)];
         }
 
         // 8. Calculate total mandatory deductions
