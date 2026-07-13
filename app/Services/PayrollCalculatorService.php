@@ -93,26 +93,57 @@ class PayrollCalculatorService
         $totalAllowances = array_sum(array_column($allowances, 'amount'));
         $grossPay = $basicSalary + $totalAllowances;
 
-        // 6. BPJS Deductions (Standard rates: JHT 2%, JP 1%, Kesehatan 1% from employee)
-        $jhtAmount = $grossPay * 0.02;
-        $jpAmount = $grossPay * 0.01;
-        $kesAmount = $grossPay * 0.01;
+        // 6. BPJS Deductions & Allowances
+        $bpjsConfig = config('payroll.bpjs', []);
         
+        // Capped wages for BPJS
+        $kesWage = min($basicSalary, $bpjsConfig['kesehatan']['max_wage'] ?? 12000000);
+        $jpWage = min($basicSalary, $bpjsConfig['jp']['max_wage'] ?? 10042300);
+
+        // Company paid (Allowances added to Bruto)
+        $jkkCompany = $basicSalary * ($bpjsConfig['jkk']['company_pct'] ?? 0.0024);
+        $jkmCompany = $basicSalary * ($bpjsConfig['jkm']['company_pct'] ?? 0.003);
+        $kesCompany = $kesWage * ($bpjsConfig['kesehatan']['company_pct'] ?? 0.04);
+        
+        // Add to allowances
+        $allowances[] = ['name' => 'Tunjangan BPJS JKK', 'amount' => $jkkCompany];
+        $allowances[] = ['name' => 'Tunjangan BPJS JKM', 'amount' => $jkmCompany];
+        $allowances[] = ['name' => 'Tunjangan BPJS Kesehatan', 'amount' => $kesCompany];
+
+        // Re-calculate Gross Pay with new BPJS allowances
+        $totalAllowances = array_sum(array_column($allowances, 'amount'));
+        $grossPay = $basicSalary + $totalAllowances;
+
+        // Employee paid (Deductions)
+        $jhtEmployee = $basicSalary * ($bpjsConfig['jht']['employee_pct'] ?? 0.02);
+        $jpEmployee  = $jpWage * ($bpjsConfig['jp']['employee_pct'] ?? 0.01);
+        $kesEmployee = $kesWage * ($bpjsConfig['kesehatan']['employee_pct'] ?? 0.01);
+
         $bpjsRecord = [
-            'jht_amount' => $jhtAmount,
-            'jp_amount' => $jpAmount,
-            'jkk_amount' => 0, // usually paid by employer
-            'jkm_amount' => 0, // usually paid by employer
-            'kesehatan_amount' => $kesAmount,
+            'jht_amount' => $jhtEmployee,
+            'jp_amount' => $jpEmployee,
+            'jkk_amount' => $jkkCompany,
+            'jkm_amount' => $jkmCompany,
+            'kesehatan_amount' => $kesEmployee,
         ];
 
-        $deductions[] = ['name' => 'BPJS JHT (2%)', 'amount' => $jhtAmount];
-        $deductions[] = ['name' => 'BPJS JP (1%)', 'amount' => $jpAmount];
-        $deductions[] = ['name' => 'BPJS Kesehatan (1%)', 'amount' => $kesAmount];
+        $deductions[] = ['name' => 'BPJS JHT (2%)', 'amount' => $jhtEmployee];
+        $deductions[] = ['name' => 'BPJS JP (1%)', 'amount' => $jpEmployee];
+        $deductions[] = ['name' => 'BPJS Kesehatan (1%)', 'amount' => $kesEmployee];
 
-        // 7. PPh 21 (TER logic simplified)
-        $terCategory = 'A';
-        $pph21Rate = 0.05; 
+        // 7. PPh 21 (TER logic)
+        $taxStatus = $employee->tax_status ?? 'TK/0';
+        $terCategory = config("payroll.ter_categories.{$taxStatus}", 'A');
+        $terRates = config("payroll.ter_rates.{$terCategory}", []);
+
+        $pph21Rate = 0;
+        foreach ($terRates as $rateTier) {
+            if ($grossPay <= $rateTier[0]) {
+                $pph21Rate = $rateTier[1];
+                break;
+            }
+        }
+        
         $pph21Amount = max(0, $grossPay * $pph21Rate);
 
         $taxRecord = [

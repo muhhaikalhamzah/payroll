@@ -318,10 +318,23 @@ class ApprovalController extends Controller
                 $model->save();
 
                 // Deduct remaining balance of loans for each payslip
-                $payslips = \App\Models\Payslip::where('payroll_run_id', $model->id)->with('components')->get();
+                $payslips = \App\Models\Payslip::where('payroll_run_id', $model->id)->with(['components', 'employee.user'])->get();
                 foreach ($payslips as $payslip) {
                     $payslip->status = 'FINAL';
                     $payslip->save();
+
+                    // Bug 1: Send notification for regular payroll run
+                    if ($model->type !== 'THR' && $payslip->employee && $payslip->employee->user) {
+                        $period = \Carbon\Carbon::createFromDate($model->period_year, $model->period_month, 1)->format('F Y');
+                        $title = "Payslip Available";
+                        $message = "Your payslip for " . $period . " is now available. Click here to view it.";
+                        
+                        $payslip->employee->user->notify(new \App\Notifications\StatusChangedNotification(
+                            $title,
+                            $message,
+                            route('payslips.show', $payslip->id)
+                        ));
+                    }
 
                     foreach ($payslip->components as $component) {
                         if ($component->employee_loan_id) {

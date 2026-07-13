@@ -50,13 +50,15 @@ class ThrCalculatorService
         }
 
         // 3. Tax Calculation (PPh 21 Non-Reguler)
+        $taxStatus = $employee->tax_status ?? 'TK/0';
+
         // Step 1: Pajak A (Reguler Disetahunkan)
         $annualizedRegularGross = $regularGrossPay * 12;
-        $taxA = $this->calculateProgressiveTax($annualizedRegularGross);
+        $taxA = $this->calculateProgressiveTax($annualizedRegularGross, $taxStatus);
 
         // Step 2: Pajak B (Reguler Disetahunkan + THR)
         $annualizedTotalGross = $annualizedRegularGross + $thrAmount;
-        $taxB = $this->calculateProgressiveTax($annualizedTotalGross);
+        $taxB = $this->calculateProgressiveTax($annualizedTotalGross, $taxStatus);
 
         // Step 3: Pajak B - Pajak A = PPh 21 THR
         $pph21Amount = max(0, $taxB - $taxA);
@@ -107,11 +109,22 @@ class ThrCalculatorService
 
     /**
      * Simplified Progressive Tax Calculation (Pasal 17).
-     * Assuming simple PTKP deduction has already happened or simplified here.
+     * Calculates PTKP dynamically based on tax status.
      */
-    private function calculateProgressiveTax(float $annualIncome): float
+    private function calculateProgressiveTax(float $annualIncome, string $taxStatus): float
     {
-        $ptkp = 54000000; // TK/0 assumption
+        $ptkpMap = [
+            'TK/0' => 54000000,
+            'TK/1' => 58500000,
+            'TK/2' => 63000000,
+            'TK/3' => 67500000,
+            'K/0'  => 58500000,
+            'K/1'  => 63000000,
+            'K/2'  => 67500000,
+            'K/3'  => 72000000,
+        ];
+        
+        $ptkp = $ptkpMap[$taxStatus] ?? 54000000;
         $pkp = max(0, $annualIncome - $ptkp);
 
         if ($pkp <= 0) return 0;

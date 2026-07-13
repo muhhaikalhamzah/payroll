@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'welcome' => 'Welcome,',
+    'logged_in_as' => 'You are logged in as',
+    'total_users' => 'Total Users',
+    'all_registered_users' => 'All registered users',
+    'superadmin' => 'Superadmin',
+    'full_access_users' => 'Full access users',
+    'admin' => 'Admin',
+    'standard_access_users' => 'Standard access users',
+    'payroll_trend' => 'Payroll Trend (Last 6 Months)',
+    'quick_actions' => 'Quick Actions',
+    'manage_users' => 'Manage Users',
+    'settings' => 'Settings',
+    'my_profile' => 'My Profile',
+    'edit_profile' => 'Edit Profile',
+    'system_information' => 'System Information',
+    'laravel_version' => 'Laravel Version:',
+    'php_version' => 'PHP Version:',
+    'environment' => 'Environment:',
+    'your_account' => 'Your Account',
+    'email' => 'Email:',
+    'member_since' => 'Member Since:',
+    'last_updated' => 'Last Updated:',
+];

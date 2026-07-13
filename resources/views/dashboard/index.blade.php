@@ -9,10 +9,10 @@
                 <div class="col-md-8">
                     <h3 class="fw-bold mb-3">
                         <i class='bx bx-smile text-primary me-2'></i>
-                        Selamat Datang, {{ Auth::user()->name }}!
+                        @lang('dashboard.welcome') {{ Auth::user()->name }}!
                     </h3>
                     <p class="text-muted mb-0">
-                        Anda login sebagai <span class="badge bg-primary">{{ Auth::user()->role?->name }}</span>
+                        @lang('dashboard.logged_in_as') <span class="badge bg-primary">{{ Auth::user()->role ? (Lang::has('roles.' . strtolower(str_replace(' ', '_', Auth::user()->role->name))) ? trans('roles.' . strtolower(str_replace(' ', '_', Auth::user()->role->name))) : Auth::user()->role->name) : '' }}</span>
                     </p>
                     <p class="text-muted mt-2">
                         <i class='bx bx-time-five me-1'></i>
@@ -35,7 +35,7 @@
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <p class="text-muted mb-1 small">Total Users</p>
+                            <p class="text-muted mb-1 small">@lang('dashboard.total_users')</p>
                             <h2 class="fw-bold mb-0">{{ $totalUsers }}</h2>
                         </div>
                         <div class="bg-primary bg-opacity-10 rounded-circle p-3">
@@ -46,7 +46,7 @@
                 <div class="card-footer bg-primary bg-opacity-10 border-0 py-2">
                     <small class="text-primary fw-semibold">
                         <i class='bx bx-trending-up me-1'></i>
-                        All registered users
+                        @lang('dashboard.all_registered_users')
                     </small>
                 </div>
             </div>
@@ -57,7 +57,7 @@
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <p class="text-muted mb-1 small">Superadmin</p>
+                            <p class="text-muted mb-1 small">@lang('dashboard.superadmin')</p>
                             <h2 class="fw-bold mb-0">{{ $superadminCount }}</h2>
                         </div>
                         <div class="bg-success bg-opacity-10 rounded-circle p-3">
@@ -68,7 +68,7 @@
                 <div class="card-footer bg-success bg-opacity-10 border-0 py-2">
                     <small class="text-success fw-semibold">
                         <i class='bx bx-check-circle me-1'></i>
-                        Full access users
+                        @lang('dashboard.full_access_users')
                     </small>
                 </div>
             </div>
@@ -79,7 +79,7 @@
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <p class="text-muted mb-1 small">Admin</p>
+                            <p class="text-muted mb-1 small">@lang('dashboard.admin')</p>
                             <h2 class="fw-bold mb-0">{{ $adminCount }}</h2>
                         </div>
                         <div class="bg-info bg-opacity-10 rounded-circle p-3">
@@ -90,7 +90,7 @@
                 <div class="card-footer bg-info bg-opacity-10 border-0 py-2">
                     <small class="text-info fw-semibold">
                         <i class='bx bx-user-circle me-1'></i>
-                        Standard access users
+                        @lang('dashboard.standard_access_users')
                     </small>
                 </div>
             </div>
@@ -106,7 +106,7 @@
         <div class="card-header bg-white border-bottom">
             <h5 class="mb-0 fw-bold">
                 <i class='bx bx-line-chart me-2 text-primary'></i>
-                Payroll Trend (Last 6 Months)
+                @lang('dashboard.payroll_trend')
             </h5>
         </div>
         <div class="card-body">
@@ -121,7 +121,7 @@
         <div class="card-header bg-white border-bottom">
             <h5 class="mb-0 fw-bold">
                 <i class='bx bx-rocket me-2 text-primary'></i>
-                Quick Actions
+                @lang('dashboard.quick_actions')
             </h5>
         </div>
         <div class="card-body">
@@ -131,7 +131,7 @@
                         <div class="card border border-primary border-opacity-25 h-100 hover-shadow">
                             <div class="card-body text-center mt-4">
                                 <i class='bx bx-user-plus fs-1 text-primary mb-2'></i>
-                                <h6 class="mb-0">Manage Users</h6>
+                                <h6 class="mb-0">@lang('dashboard.manage_users')</h6>
                             </div>
                         </div>
                     </a>
@@ -141,7 +141,7 @@
                         <div class="card border border-success border-opacity-25 h-100 hover-shadow">
                             <div class="card-body text-center mt-4"">
                                 <i class='bx bx-cog fs-1 text-success mb-2'></i>
-                                <h6 class=" mb-0">Settings</h6>
+                                <h6 class=" mb-0">@lang('dashboard.settings')</h6>
                             </div>
                         </div>
                     </a>
@@ -151,7 +151,7 @@
                         <div class="card border border-info border-opacity-25 h-100 hover-shadow">
                             <div class="card-body text-center mt-4"">
                                 <i class='bx bx-user-circle fs-1 text-info mb-2'></i>
-                                <h6 class=" mb-0">My Profile</h6>
+                                <h6 class=" mb-0">@lang('dashboard.my_profile')</h6>
                             </div>
                         </div>
                     </a>
@@ -161,7 +161,7 @@
                         <div class="card border border-warning border-opacity-25 h-100 hover-shadow">
                             <div class="card-body text-center mt-4"">
                                 <i class='bx bx-edit fs-1 text-warning mb-2'></i>
-                                <h6 class=" mb-0">Edit Profile</h6>
+                                <h6 class=" mb-0">@lang('dashboard.edit_profile')</h6>
                             </div>
                         </div>
                     </a>
@@ -177,22 +177,22 @@
                 <div class="card-header bg-white border-bottom">
                     <h6 class="mb-0 fw-bold">
                         <i class='bx bx-info-circle me-2 text-primary'></i>
-                        System Information
+                        @lang('dashboard.system_information')
                     </h6>
                 </div>
                 <div class="card-body">
                     <ul class="list-unstyled mb-0 pt-4">
                         <li class="mb-2">
                             <i class='bx bx-check-circle text-success me-2'></i>
-                            <strong>Laravel Version:</strong> {{ app()->version() }}
+                            <strong>@lang('dashboard.laravel_version')</strong> {{ app()->version() }}
                         </li>
                         <li class="mb-2">
                             <i class='bx bx-check-circle text-success me-2'></i>
-                            <strong>PHP Version:</strong> {{ PHP_VERSION }}
+                            <strong>@lang('dashboard.php_version')</strong> {{ PHP_VERSION }}
                         </li>
                         <li class="mb-2">
                             <i class='bx bx-check-circle text-success me-2'></i>
-                            <strong>Environment:</strong> {{ config('app.env') }}
+                            <strong>@lang('dashboard.environment')</strong> {{ config('app.env') }}
                         </li>
                     </ul>
                 </div>
@@ -200,26 +200,26 @@
         </div>
 
         <div class="col-md-6">
-            <div class="card shadow-sm border-0 pt-4">
+            <div class="card shadow-sm border-0">
                 <div class="card-header bg-white border-bottom">
                     <h6 class="mb-0 fw-bold">
                         <i class='bx bx-user me-2 text-primary'></i>
-                        Your Account
+                        @lang('dashboard.your_account')
                     </h6>
                 </div>
                 <div class="card-body">
-                    <ul class="list-unstyled mb-0">
+                    <ul class="list-unstyled mb-0 pt-4">
                         <li class="mb-2">
                             <i class='bx bx-envelope text-primary me-2'></i>
-                            <strong>Email:</strong> {{ Auth::user()->email }}
+                            <strong>@lang('dashboard.email')</strong> {{ Auth::user()->email }}
                         </li>
                         <li class="mb-2">
                             <i class='bx bx-calendar text-primary me-2'></i>
-                            <strong>Member Since:</strong> {{ Auth::user()->created_at->format('d M Y') }}
+                            <strong>@lang('dashboard.member_since')</strong> {{ Auth::user()->created_at->format('d M Y') }}
                         </li>
                         <li class="mb-2">
                             <i class='bx bx-time text-primary me-2'></i>
-                            <strong>Last Updated:</strong> {{ Auth::user()->updated_at->diffForHumans() }}
+                            <strong>@lang('dashboard.last_updated')</strong> {{ Auth::user()->updated_at->diffForHumans() }}
                         </li>
                     </ul>
                 </div>

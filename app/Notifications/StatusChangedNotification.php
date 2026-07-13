@@ -13,14 +13,16 @@ class StatusChangedNotification extends Notification
 
     public $title;
     public $message;
+    public $actionUrl;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct($title, $message)
+    public function __construct($title, $message, $actionUrl = null)
     {
         $this->title = $title;
         $this->message = $message;
+        $this->actionUrl = $actionUrl ?? url('/dashboard');
     }
 
     /**
@@ -41,7 +43,7 @@ class StatusChangedNotification extends Notification
         return (new MailMessage)
                     ->subject($this->title)
                     ->line($this->message)
-                    ->action('View Dashboard', url('/dashboard'))
+                    ->action('View Details', $this->actionUrl)
                     ->line('Thank you for using our application!');
     }
 
@@ -55,6 +57,7 @@ class StatusChangedNotification extends Notification
         return [
             'title' => $this->title,
             'message' => $this->message,
+            'action_url' => $this->actionUrl,
         ];
     }
 }

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-
-
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="google" content="notranslate">
 
     <title>{{ $setting->app_name }} | {{ $title }}</title>
     <meta content="{{ $setting->description }}" name="description">
@@ -34,6 +34,17 @@
     <link href="{{ asset('niceadmin/vendor/select2/css/select2.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('niceadmin/vendor/select2/css/select2-bootstrap-5-theme.min.css') }}" rel="stylesheet" />
 
+    <!-- Theme Initialization to prevent FOUC -->
+    <script>
+        const getPreferredTheme = () => {
+            if (localStorage.getItem('theme')) {
+                return localStorage.getItem('theme');
+            }
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-bs-theme', getPreferredTheme());
+    </script>
+
     <!-- Template Main CSS File -->
     <link href="{{ asset('niceadmin/css/style.css') }}" rel="stylesheet">
 
@@ -42,11 +53,61 @@
             /* ====== UBAH WARNA TEMA DI SINI ====== */
             --theme-bg: #000080;
             --theme-hover: #020260;
-            /* warna lebih gelap untuk efek hover */
             --theme-text: #ffffff;
             --main-bg: #eeeeee;
-            /* warna background utama / halaman */
-            /* ===================================== */
+        }
+
+        [data-bs-theme="dark"] {
+            --main-bg: #121416;
+            --bs-body-color: #dee2e6;
+            --bs-body-bg: #121416;
+        }
+
+        [data-bs-theme="dark"] .card, 
+        [data-bs-theme="dark"] .modal-content {
+            background-color: #1a1d20 !important;
+            border-color: #2b3035 !important;
+            color: #dee2e6 !important;
+        }
+
+        [data-bs-theme="dark"] .sidebar {
+            background-color: #1a1d20 !important;
+        }
+        
+        [data-bs-theme="dark"] .sidebar-nav .nav-link {
+            background-color: transparent !important;
+            color: #dee2e6;
+        }
+
+        [data-bs-theme="dark"] .sidebar-nav .nav-link:hover,
+        [data-bs-theme="dark"] .sidebar-nav .nav-link:hover i,
+        [data-bs-theme="dark"] .sidebar-nav .nav-link:not(.collapsed),
+        [data-bs-theme="dark"] .sidebar-nav .nav-link:not(.collapsed) i {
+            color: #6ea8fe !important;
+        }
+
+        [data-bs-theme="dark"] .sidebar-nav .nav-content a:hover,
+        [data-bs-theme="dark"] .sidebar-nav .nav-content a.active {
+            color: #6ea8fe !important;
+        }
+
+        [data-bs-theme="dark"] table.dataTable tbody tr,
+        [data-bs-theme="dark"] table.dataTable tbody td {
+            background-color: transparent !important;
+            color: #dee2e6 !important;
+            border-color: #2b3035;
+        }
+
+        [data-bs-theme="dark"] .form-control,
+        [data-bs-theme="dark"] .form-select,
+        [data-bs-theme="dark"] .select2-container .select2-selection--single {
+            background-color: #212529 !important;
+            border-color: #343a40 !important;
+            color: #dee2e6 !important;
+        }
+
+        [data-bs-theme="dark"] .select2-container .select2-selection--single .select2-selection__rendered {
+            color: #dee2e6 !important;
         }
 
         label.required::after {
@@ -74,6 +135,7 @@
             display: flex;
             flex-direction: column;
             background-color: var(--main-bg) !important;
+            overflow-x: hidden;
         }
 
         #main {
@@ -166,19 +228,6 @@
         .select2-container .select2-selection--single .select2-selection__rendered {
             color: #212529 !important;
         }
-
-        /* Hide Google Translate Toolbar */
-        .goog-te-banner-frame.skiptranslate {
-            display: none !important;
-        } 
-        body {
-            top: 0px !important; 
-        }
-        .goog-te-combo {
-            padding: 6px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
     </style>
 
     <!-- =======================================================
@@ -196,30 +245,75 @@
     <header id="header" class="header fixed-top d-flex align-items-center">
 
         <div class="d-flex align-items-center justify-content-between">
-            <a href="{{ route('dashboard.index') }}" class="logo d-flex align-items-center">
-                <img src="{{ $setting->logo ? asset('storage/' . $setting->logo) : asset('niceadmin/img/laravel.png') }}"
-                    alt="">
-                <span class="d-none d-lg-block">{{ $setting->app_name }}</span>
+            <a href="{{ route('dashboard.index') }}" class="logo d-flex align-items-center" id="header-logo-container" style="perspective: 600px;">
+                <div id="header-logo-tilt" style="transform-style: preserve-3d; transition: transform 0.15s ease-out; display: flex; align-items: center;">
+                    <img src="{{ $setting->logo ? asset('storage/' . $setting->logo) : asset('niceadmin/img/laravel.png') }}"
+                        alt="" style="transform: translateZ(15px);">
+                    <span class="d-none d-lg-block ms-2 notranslate" style="transform: translateZ(5px);">{{ $setting->app_name }}</span>
+                </div>
             </a>
-            <i class="bi bi-list toggle-sidebar-btn"></i>
+            <!-- Nice icon for dashboard toggle as requested -->
+            <div class="d-flex align-items-center">
+                <i class="bi bi-menu-button-wide toggle-sidebar-btn ms-3 text-primary fs-5" title="@lang('common.dashboard')" style="cursor: pointer;"></i>
+                <i class="bi bi-arrows-fullscreen ms-3 text-secondary fs-5" id="fullscreen-btn" title="@lang('common.fullscreen')" style="cursor: pointer;" onclick="toggleFullScreen()"></i>
+            </div>
         </div><!-- End Logo -->
 
-        <form id="switch-user-form" action="{{ route('login.switch_user') }}" method="POST" class="w-100 mx-2">
+        <form id="switch-user-form" action="{{ route('login.switch_user') }}" method="POST" class="w-auto mx-3 d-none d-md-flex align-items-center" style="min-width: 250px;">
             @csrf
-            <select name="user_id" class="form-control select2-default" id="switch-user-select">
-                @foreach (\App\Models\User::all() as $u)
-                    <option value="{{ $u->id }}" {{ Auth::id() == $u->id ? 'selected' : '' }}>
-                        {{ $u->name }} ({{ $u->role?->name }})
-                    </option>
-                @endforeach
-            </select>
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-light border-end-0 text-muted" title="Switch Account">
+                    <i class="bi bi-people"></i>
+                </span>
+                <select name="user_id" class="form-select form-select-sm border-start-0 shadow-none bg-light" id="switch-user-select" style="cursor: pointer;">
+                    @foreach (\App\Models\User::all() as $u)
+                        <option value="{{ $u->id }}" {{ Auth::id() == $u->id ? 'selected' : '' }}>
+                            {{ $u->name }} ({{ $u->role ? (Lang::has('roles.' . strtolower(str_replace(' ', '_', $u->role->name))) ? trans('roles.' . strtolower(str_replace(' ', '_', $u->role->name))) : $u->role->name) : '' }})
+                        </option>
+                    @endforeach
+                </select>
+            </div>
         </form>
 
-        <!-- Google Translate Widget -->
-        <div id="google_translate_element" class="mx-3 mt-2"></div>
+        <!-- Global Search Component -->
+        <x-global-search />
 
         <nav class="header-nav ms-auto">
             <ul class="d-flex align-items-center">
+
+                <!-- Mobile Search Toggle -->
+                <li class="nav-item d-md-none">
+                    <a class="nav-link nav-icon search-bar-toggle" href="#" onclick="document.getElementById('global-search-wrapper').classList.toggle('d-none'); document.getElementById('global-search-wrapper').classList.toggle('position-absolute'); document.getElementById('global-search-wrapper').style.top = '60px'; document.getElementById('global-search-wrapper').style.left = '0'; document.getElementById('global-search-wrapper').style.width = '100%'; document.getElementById('global-search-wrapper').style.zIndex = '9999'; document.getElementById('global-search-wrapper').style.backgroundColor = 'var(--bs-body-bg)'; document.getElementById('global-search-wrapper').style.padding = '10px';">
+                        <i class="bi bi-search"></i>
+                    </a>
+                </li>
+
+                <!-- Translate Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link nav-icon d-flex align-items-center" href="#" data-bs-toggle="dropdown" title="@lang('common.translate')">
+                        <i class="bi bi-translate fs-5"></i>
+                        <span class="d-none d-md-inline ms-1 text-muted" style="font-size: 0.75rem; font-weight: 600;">{{ strtoupper(App::getLocale()) }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end p-2 border-0 shadow-sm" style="min-width: 140px; border-radius: 10px;">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center py-2 mb-1 {{ App::getLocale() == 'id' ? 'active bg-primary text-white rounded' : 'rounded' }}" href="{{ route('language.switch', 'id') }}">
+                                <span class="me-2 badge {{ App::getLocale() == 'id' ? 'bg-light text-primary' : 'bg-secondary' }}">ID</span> Indonesia
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center py-2 {{ App::getLocale() == 'en' ? 'active bg-primary text-white rounded' : 'rounded' }}" href="{{ route('language.switch', 'en') }}">
+                                <span class="me-2 badge {{ App::getLocale() == 'en' ? 'bg-light text-primary' : 'bg-secondary' }}">EN</span> English
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Theme Toggle Button -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link nav-icon" href="#" id="dashboard-theme-toggle" title="Toggle Dark/Light Mode">
+                        <i class="bi bi-moon-stars" id="dashboard-theme-icon"></i>
+                    </a>
+                </li>
 
                 <li class="nav-item dropdown">
                     <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
@@ -267,7 +361,7 @@
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                         <li class="dropdown-header">
                             <h6>{{ Auth::user()->name }}</h6>
-                            <span>{{ Auth::user()->role?->name }}</span>
+                            <span>{{ Auth::user()->role ? (Lang::has('roles.' . strtolower(str_replace(' ', '_', Auth::user()->role->name))) ? trans('roles.' . strtolower(str_replace(' ', '_', Auth::user()->role->name))) : Auth::user()->role->name) : '' }}</span>
                         </li>
                         <li>
                             <hr class="dropdown-divider">
@@ -276,7 +370,7 @@
                         <li>
                             <a class="dropdown-item d-flex align-items-center" href="{{ route('dashboard.show') }}">
                                 <i class="bi bi-person"></i>
-                                <span>My Profile</span>
+                                <span>@lang('common.profile')</span>
                             </a>
                         </li>
                         <li>
@@ -286,13 +380,19 @@
                         <li>
                             <a class="dropdown-item d-flex align-items-center" href="{{ route('dashboard.edit') }}">
                                 <i class="bi bi-gear"></i>
-                                <span>Account Settings</span>
+                                <span>@lang('common.settings')</span>
                             </a>
                         </li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
 
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="{{ route('dashboard.index') }}">
+                                <i class="bi bi-question-circle"></i>
+                                <span>@lang('common.help')</span>
+                            </a>
+                        </li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -301,7 +401,7 @@
                             <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal"
                                 data-bs-target="#logoutModal">
                                 <i class="bi bi-box-arrow-right"></i>
-                                <span>Sign Out</span>
+                                <span>@lang('common.sign_out')</span>
                             </a>
                         </li>
 
@@ -628,17 +728,96 @@
 
     @stack('scripts')
 
-    <!-- Google Translate Script -->
-    <script type="text/javascript">
-    function googleTranslateElementInit() {
-        new google.translate.TranslateElement({
-            pageLanguage: 'en', 
-            includedLanguages: 'id,en', 
-            layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-        }, 'google_translate_element');
-    }
+    <!-- Theme Toggle Logic -->
+    <script>
+        function toggleFullScreen() {
+            const btn = document.getElementById('fullscreen-btn');
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().then(() => {
+                    if(btn) {
+                        btn.classList.remove('bi-arrows-fullscreen');
+                        btn.classList.add('bi-fullscreen-exit');
+                    }
+                }).catch(err => {
+                    console.log(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen().then(() => {
+                        if(btn) {
+                            btn.classList.remove('bi-fullscreen-exit');
+                            btn.classList.add('bi-arrows-fullscreen');
+                        }
+                    });
+                }
+            }
+        }
     </script>
-    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeBtn = document.getElementById('dashboard-theme-toggle');
+            const themeIcon = document.getElementById('dashboard-theme-icon');
+
+            const setTheme = (theme) => {
+                document.documentElement.setAttribute('data-bs-theme', theme);
+                localStorage.setItem('theme', theme);
+                if (theme === 'dark') {
+                    themeIcon.classList.remove('bi-moon-stars');
+                    themeIcon.classList.add('bi-sun');
+                } else {
+                    themeIcon.classList.remove('bi-sun');
+                    themeIcon.classList.add('bi-moon-stars');
+                }
+            };
+
+            // Set initial icon
+            setTheme(document.documentElement.getAttribute('data-bs-theme'));
+
+            themeBtn.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+                setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+            });
+        });
+    </script>
+
+    <!-- Header Logo 3D Parallax Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const headerLogoContainer = document.getElementById('header-logo-container');
+            const headerLogoTilt = document.getElementById('header-logo-tilt');
+
+            if (headerLogoContainer && headerLogoTilt) {
+                const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                const isFinePointer = window.matchMedia('(pointer: fine)').matches;
+
+                if (!prefersReducedMotion && isFinePointer) {
+                    headerLogoContainer.addEventListener('mousemove', (e) => {
+                        const rect = headerLogoContainer.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        
+                        const centerX = rect.width / 2;
+                        const centerY = rect.height / 2;
+                        
+                        const percentX = (x - centerX) / centerX;
+                        const percentY = (y - centerY) / centerY;
+                        
+                        const maxRotation = 12; // tilt degree
+                        const rotateX = percentY * -maxRotation; 
+                        const rotateY = percentX * maxRotation;
+                        
+                        headerLogoTilt.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                    });
+
+                    headerLogoContainer.addEventListener('mouseleave', () => {
+                        headerLogoTilt.style.transform = `rotateX(0deg) rotateY(0deg)`;
+                    });
+                }
+            }
+        });
+    </script>
+    
+    {{-- <x-ticker /> Temporarily hidden as per user request --}}
 
 </body>
 

@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'welcome' => 'Selamat Datang,',
+    'logged_in_as' => 'Anda login sebagai',
+    'total_users' => 'Total Pengguna',
+    'all_registered_users' => 'Semua pengguna terdaftar',
+    'superadmin' => 'Superadmin',
+    'full_access_users' => 'Pengguna akses penuh',
+    'admin' => 'Admin',
+    'standard_access_users' => 'Pengguna akses standar',
+    'payroll_trend' => 'Tren Penggajian (6 Bulan Terakhir)',
+    'quick_actions' => 'Aksi Cepat',
+    'manage_users' => 'Kelola Pengguna',
+    'settings' => 'Pengaturan',
+    'my_profile' => 'Profil Saya',
+    'edit_profile' => 'Ubah Profil',
+    'system_information' => 'Informasi Sistem',
+    'laravel_version' => 'Versi Laravel:',
+    'php_version' => 'Versi PHP:',
+    'environment' => 'Lingkungan:',
+    'your_account' => 'Akun Anda',
+    'email' => 'Email:',
+    'member_since' => 'Anggota Sejak:',
+    'last_updated' => 'Terakhir Diperbarui:',
+];

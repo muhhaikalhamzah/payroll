@@ -36,17 +36,33 @@
                         <label for="nik" class="form-label fw-medium">NIK <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="nik" name="nik" value="{{ old('nik', $employee->nik) }}" required maxlength="16" minlength="16">
                     </div>
-                    <div class="col-md-6">
-                        <label for="status" class="form-label fw-medium">Status <span class="text-danger">*</span></label>
-                        <select class="form-select" id="status" name="status" required>
-                            <option value="active" {{ old('status', $employee->status) == 'active' ? 'selected' : '' }}>Active</option>
-                            <option value="resign" {{ old('status', $employee->status) == 'resign' ? 'selected' : '' }}>Resign</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="row mb-3">
-                    <div class="col-md-6 mb-3 mb-md-0">
+                      <div class="col-md-6">
+                          <label for="status" class="form-label fw-medium">Status <span class="text-danger">*</span></label>
+                          <select class="form-select" id="status" name="status" required>
+                              <option value="active" {{ old('status', $employee->status) == 'active' ? 'selected' : '' }}>Active</option>
+                              <option value="resign" {{ old('status', $employee->status) == 'resign' ? 'selected' : '' }}>Resign</option>
+                          </select>
+                      </div>
+                  </div>
+                  
+                  <div class="row mb-3">
+                      <div class="col-md-6 mb-3 mb-md-0">
+                          <label for="tax_status" class="form-label fw-medium">PTKP / Tax Status <span class="text-danger">*</span></label>
+                          <select class="form-select" id="tax_status" name="tax_status" required>
+                              <option value="TK/0" {{ old('tax_status', $employee->tax_status) == 'TK/0' ? 'selected' : '' }}>TK/0 (Single, 0 Dependents)</option>
+                              <option value="TK/1" {{ old('tax_status', $employee->tax_status) == 'TK/1' ? 'selected' : '' }}>TK/1 (Single, 1 Dependent)</option>
+                              <option value="TK/2" {{ old('tax_status', $employee->tax_status) == 'TK/2' ? 'selected' : '' }}>TK/2 (Single, 2 Dependents)</option>
+                              <option value="TK/3" {{ old('tax_status', $employee->tax_status) == 'TK/3' ? 'selected' : '' }}>TK/3 (Single, 3 Dependents)</option>
+                              <option value="K/0" {{ old('tax_status', $employee->tax_status) == 'K/0' ? 'selected' : '' }}>K/0 (Married, 0 Dependents)</option>
+                              <option value="K/1" {{ old('tax_status', $employee->tax_status) == 'K/1' ? 'selected' : '' }}>K/1 (Married, 1 Dependent)</option>
+                              <option value="K/2" {{ old('tax_status', $employee->tax_status) == 'K/2' ? 'selected' : '' }}>K/2 (Married, 2 Dependents)</option>
+                              <option value="K/3" {{ old('tax_status', $employee->tax_status) == 'K/3' ? 'selected' : '' }}>K/3 (Married, 3 Dependents)</option>
+                          </select>
+                      </div>
+                  </div>
+                  
+                  <div class="row mb-3">
+                      <div class="col-md-6 mb-3 mb-md-0">
                         <label for="first_name" class="form-label fw-medium">First Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="first_name" name="first_name" value="{{ old('first_name', $employee->first_name) }}" required>
                     </div>

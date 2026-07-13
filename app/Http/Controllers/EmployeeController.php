@@ -53,6 +53,7 @@ class EmployeeController extends Controller
             'department_id' => ['required', 'exists:departments,id'],
             'position_id' => ['required', 'exists:positions,id'],
             'status' => ['required', 'in:active,resign'],
+            'tax_status' => ['required', 'string', 'in:TK/0,TK/1,TK/2,TK/3,K/0,K/1,K/2,K/3'],
             
             // User account options
             'user_action' => ['required', 'in:none,link_existing,create_new'],
@@ -150,6 +151,7 @@ class EmployeeController extends Controller
             'department_id' => ['required', 'exists:departments,id'],
             'position_id' => ['required', 'exists:positions,id'],
             'status' => ['required', 'in:active,resign'],
+            'tax_status' => ['required', 'string', 'in:TK/0,TK/1,TK/2,TK/3,K/0,K/1,K/2,K/3'],
             
             // Existing user link option
             'user_id' => ['nullable', 'exists:users,id'],
