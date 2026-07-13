@@ -63,6 +63,23 @@ class ApprovalController extends Controller
 
             $model->submitForApproval($request->notes, $status);
 
+            // Notify user
+            if ($model instanceof \App\Models\PayrollRun) {
+                // Get Finance Admin
+                $financeAdmins = \App\Models\User::whereHas('role', function($q){ $q->where('slug', 'finance-admin'); })->get();
+                \Illuminate\Support\Facades\Notification::send($financeAdmins, new \App\Notifications\StatusChangedNotification(
+                    "Payroll Run Submitted",
+                    "A payroll run has been submitted for your approval."
+                ));
+            } elseif ($model instanceof \App\Models\LeaveRequest) {
+                // Get Manager
+                $managers = \App\Models\User::whereHas('role', function($q){ $q->where('slug', 'manager'); })->get();
+                \Illuminate\Support\Facades\Notification::send($managers, new \App\Notifications\StatusChangedNotification(
+                    "Leave Request Submitted",
+                    "A new leave request has been submitted by " . ($model->employee->user->name ?? 'Employee') . "."
+                ));
+            }
+
             DB::commit();
 
             return back()->with('success', 'Submitted for approval successfully.');
@@ -130,6 +147,34 @@ class ApprovalController extends Controller
 
             $model->approveApproval(null, $request->comments, $status);
 
+            // Notify user
+            if ($model instanceof \App\Models\PayrollRun) {
+                // If it's a Payroll Run, notify creator
+                $creator = \App\Models\User::find($model->created_by);
+                if ($creator) {
+                    $creator->notify(new \App\Notifications\StatusChangedNotification(
+                        "Payroll Run Approved",
+                        "Your payroll run has been approved."
+                    ));
+                }
+            } elseif ($model instanceof \App\Models\LeaveRequest) {
+                if ($status === 'PENDING_HR') {
+                    // Notify HR Admin
+                    $hrAdmins = \App\Models\User::whereHas('role', function($q){ $q->where('slug', 'hr-admin'); })->get();
+                    \Illuminate\Support\Facades\Notification::send($hrAdmins, new \App\Notifications\StatusChangedNotification(
+                        "Leave Request Approval Pending",
+                        "A leave request by " . ($model->employee->user->name ?? 'Employee') . " requires your approval."
+                    ));
+                } elseif ($status === 'APPROVED') {
+                    if ($model->employee && $model->employee->user) {
+                        $model->employee->user->notify(new \App\Notifications\StatusChangedNotification(
+                            "Leave Request Approved",
+                            "Your leave request has been fully approved."
+                        ));
+                    }
+                }
+            }
+
             DB::commit();
 
             return back()->with('success', 'Approved successfully.');
@@ -173,6 +218,24 @@ class ApprovalController extends Controller
             }
 
             $model->rejectApproval(null, $request->comments);
+
+            // Notify user
+            if ($model instanceof \App\Models\PayrollRun) {
+                $creator = \App\Models\User::find($model->created_by);
+                if ($creator) {
+                    $creator->notify(new \App\Notifications\StatusChangedNotification(
+                        "Payroll Run Rejected",
+                        "Your payroll run has been rejected. Reason: " . $request->comments
+                    ));
+                }
+            } elseif ($model instanceof \App\Models\LeaveRequest) {
+                if ($model->employee && $model->employee->user) {
+                    $model->employee->user->notify(new \App\Notifications\StatusChangedNotification(
+                        "Leave Request Rejected",
+                        "Your leave request has been rejected. Reason: " . $request->comments
+                    ));
+                }
+            }
 
             DB::commit();
 

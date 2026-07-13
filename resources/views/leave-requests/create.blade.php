@@ -1,6 +1,5 @@
-@extends('layouts.app')
-
-@section('content')
+<x-app>
+    <x-slot:title>{{ $title }}</x-slot:title>
 <div class="pagetitle">
   <h1>{{ $title }}</h1>
 </div>
@@ -106,4 +105,4 @@
     </div>
   </div>
 </section>
-@endsection
+</x-app>

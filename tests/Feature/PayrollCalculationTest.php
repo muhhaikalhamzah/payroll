@@ -43,6 +43,7 @@ class PayrollCalculationTest extends TestCase
             'nik' => '1234567890',
             'first_name' => 'John',
             'last_name' => 'Doe',
+            'email' => 'john@example.com',
             'gender' => 'Male',
             'status' => 'active',
             'hire_date' => Carbon::create(2026, 1, 15)->format('Y-m-d'),
@@ -71,12 +72,12 @@ class PayrollCalculationTest extends TestCase
         
         $user1 = User::factory()->create(['role_id' => $role1->id]);
         $emp1 = Employee::create([
-            'user_id' => $user1->id, 'employee_id' => 'E1', 'nik' => '111', 'first_name' => 'A', 'last_name' => 'A', 'status' => 'active'
+            'user_id' => $user1->id, 'employee_id' => 'E1', 'nik' => '111', 'first_name' => 'A', 'last_name' => 'A', 'email' => 'a@example.com', 'status' => 'active', 'hire_date' => now()->format('Y-m-d')
         ]);
         
         $user2 = User::factory()->create(['role_id' => $role1->id]);
         $emp2 = Employee::create([
-            'user_id' => $user2->id, 'employee_id' => 'E2', 'nik' => '222', 'first_name' => 'B', 'last_name' => 'B', 'status' => 'active'
+            'user_id' => $user2->id, 'employee_id' => 'E2', 'nik' => '222', 'first_name' => 'B', 'last_name' => 'B', 'email' => 'b@example.com', 'status' => 'active', 'hire_date' => now()->format('Y-m-d')
         ]);
 
         $hrRole = Role::where('slug', 'hr-admin')->first();

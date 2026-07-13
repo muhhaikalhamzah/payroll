@@ -35,6 +35,9 @@ class RolePermissionSeeder extends Seeder
             'view-leave-requests',
             'submit-leave-requests',
             'approve-leave-requests',
+            
+            // Audit Logs
+            'view-audit-logs',
         ];
 
         $permissionModels = [];

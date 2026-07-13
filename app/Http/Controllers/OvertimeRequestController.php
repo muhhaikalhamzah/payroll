@@ -53,7 +53,16 @@ class OvertimeRequestController extends Controller
             return redirect()->back()->withInput()->with('error', 'Cannot request overtime for a date without an attendance record.');
         }
 
-        OvertimeRequest::create($validated);
+        $overtimeRequest = OvertimeRequest::create($validated);
+
+        if ($validated['status'] === 'PENDING_MANAGER') {
+            $managers = \App\Models\User::whereHas('role', function($q){ $q->where('slug', 'manager'); })->get();
+            \Illuminate\Support\Facades\Notification::send($managers, new \App\Notifications\StatusChangedNotification(
+                "Overtime Request Pending",
+                "An overtime request by " . ($overtimeRequest->employee->user->name ?? 'Employee') . " requires approval."
+            ));
+        }
+
         return redirect()->route('overtime-requests.index')->with('success', 'Overtime request created successfully.');
     }
 
@@ -96,7 +105,26 @@ class OvertimeRequestController extends Controller
             $validated['approved_by'] = Auth::id();
         }
 
+        $oldStatus = $overtime_request->status;
         $overtime_request->update($validated);
+
+        if ($oldStatus !== $validated['status']) {
+            if ($validated['status'] === 'PENDING_MANAGER') {
+                $managers = \App\Models\User::whereHas('role', function($q){ $q->where('slug', 'manager'); })->get();
+                \Illuminate\Support\Facades\Notification::send($managers, new \App\Notifications\StatusChangedNotification(
+                    "Overtime Request Pending",
+                    "An overtime request by " . ($overtime_request->employee->user->name ?? 'Employee') . " requires approval."
+                ));
+            } elseif (in_array($validated['status'], ['APPROVED', 'REJECTED'])) {
+                if ($overtime_request->employee && $overtime_request->employee->user) {
+                    $overtime_request->employee->user->notify(new \App\Notifications\StatusChangedNotification(
+                        "Overtime Request " . ucfirst(strtolower($validated['status'])),
+                        "Your overtime request has been " . strtolower($validated['status']) . "."
+                    ));
+                }
+            }
+        }
+
         return redirect()->route('overtime-requests.index')->with('success', 'Overtime request updated successfully.');
     }
 

@@ -1,6 +1,5 @@
-@extends('layouts.app')
-
-@section('content')
+<x-app>
+    <x-slot:title>{{ $title }}</x-slot:title>
 <div class="pagetitle">
   <h1>{{ $title }}</h1>
 </div>
@@ -116,4 +115,4 @@ function rejectRequest(id) {
     }
 }
 </script>
-@endsection
+</x-app>

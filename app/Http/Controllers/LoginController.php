@@ -17,7 +17,7 @@ class LoginController extends Controller
 
         return view('login.index', [
             'title' => 'login',
-            'setting' => Setting::first(),
+            'setting' => Setting::first() ?? new Setting(),
             'email' => $email,
             'password' => $password,
             'remember' => $email ? true : false

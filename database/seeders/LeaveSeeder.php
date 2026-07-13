@@ -24,5 +24,40 @@ class LeaveSeeder extends Seeder
 
         // Generate leave balances for this year
         \Illuminate\Support\Facades\Artisan::call('leave:generate-balances');
+
+        // Create dummy leave requests
+        $employees = \App\Models\Employee::all();
+        if ($employees->isNotEmpty()) {
+            $leaveTypes = \App\Models\LeaveType::all();
+            
+            foreach ($employees as $employee) {
+                // Randomly create 0 to 2 leave requests per employee
+                $numRequests = rand(0, 2);
+                for ($i = 0; $i < $numRequests; $i++) {
+                    $leaveType = $leaveTypes->random();
+                    $startDate = now()->subDays(rand(1, 60));
+                    $endDate = $startDate->copy()->addDays(rand(1, 3));
+                    $status = collect(['DRAFT', 'PENDING_MANAGER', 'PENDING_HR', 'APPROVED', 'REJECTED'])->random();
+
+                    $leaveRequest = \App\Models\LeaveRequest::create([
+                        'employee_id' => $employee->id,
+                        'leave_type_id' => $leaveType->id,
+                        'start_date' => $startDate->format('Y-m-d'),
+                        'end_date' => $endDate->format('Y-m-d'),
+                        'reason' => 'Dummy leave request ' . ($i + 1),
+                        'status' => $status
+                    ]);
+
+                    // If approved/rejected, add an approval log
+                    if (in_array($status, ['APPROVED', 'REJECTED'])) {
+                        $leaveRequest->approvals()->create([
+                            'approver_id' => \App\Models\User::first()->id ?? 1,
+                            'status' => $status,
+                            'notes' => 'Auto generated ' . strtolower($status),
+                        ]);
+                    }
+                }
+            }
+        }
     }
 }

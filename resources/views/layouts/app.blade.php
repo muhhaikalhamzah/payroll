@@ -205,6 +205,40 @@
         <nav class="header-nav ms-auto">
             <ul class="d-flex align-items-center">
 
+                <li class="nav-item dropdown">
+                    <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-bell"></i>
+                        @if(auth()->user()->unreadNotifications->count() > 0)
+                            <span class="badge bg-primary badge-number">{{ auth()->user()->unreadNotifications->count() }}</span>
+                        @endif
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
+                        <li class="dropdown-header">
+                            You have {{ auth()->user()->unreadNotifications->count() }} new notifications
+                            <a href="{{ route('notifications.index') }}"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        @foreach(auth()->user()->unreadNotifications->take(3) as $notification)
+                        <li class="notification-item">
+                            <i class="bi bi-info-circle text-primary"></i>
+                            <div>
+                                <h4>{{ $notification->data['title'] ?? 'Notification' }}</h4>
+                                <p>{{ $notification->data['message'] ?? '' }}</p>
+                                <p>{{ $notification->created_at->diffForHumans() }}</p>
+                            </div>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        @endforeach
+                        <li class="dropdown-footer">
+                            <a href="{{ route('notifications.index') }}">Show all notifications</a>
+                        </li>
+                    </ul>
+                </li>
+
                 <li class="nav-item dropdown pe-3">
 
                     <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
@@ -407,6 +441,15 @@
                 </li>
             @endcan
 
+            @if(Auth::user()->role?->slug === 'super-admin')
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('audit-logs.*') ? '' : 'collapsed' }}"
+                        href="{{ route('audit-logs.index') }}">
+                        <i class='bx bx-shield-quarter'></i>
+                        <span>Audit Logs</span>
+                    </a>
+                </li>
+            @endif
 
         </ul>
 

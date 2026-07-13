@@ -61,6 +61,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/payslips/{payslip}/pdf', [\App\Http\Controllers\PayslipController::class, 'showPdf'])->name('payslips.pdf');
     Route::get('/reports/payroll-runs/{payrollRun}/ebupot', [\App\Http\Controllers\ReportController::class, 'exportEBupot'])->name('payroll-runs.ebupot');
 
+    // Audit Logs
+    Route::resource('audit-logs', \App\Http\Controllers\AuditLogController::class)->only(['index', 'show']);
+
+    // Notifications
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/mark-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+
     // Generic Approvals
     Route::post('/approvals/{type}/{id}/submit', [\App\Http\Controllers\ApprovalController::class, 'submit'])->name('approvals.submit');
     Route::post('/approvals/{type}/{id}/approve', [\App\Http\Controllers\ApprovalController::class, 'approve'])->name('approvals.approve');

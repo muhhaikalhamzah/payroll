@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\Auditable;
 
 class Payslip extends Model
 {
+    use HasFactory, Auditable;
+
     protected $fillable = ['payroll_run_id', 'employee_id', 'basic_salary', 'total_allowances', 'total_deductions', 'net_pay', 'status'];
 
     public function payrollRun()

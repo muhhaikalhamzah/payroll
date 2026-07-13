@@ -65,6 +65,14 @@ class User extends Authenticatable
         return $this->role?->slug === 'employee';
     }
 
+    public function hasRole(string|array $roles): bool
+    {
+        if (is_array($roles)) {
+            return in_array($this->role?->slug, $roles);
+        }
+        return $this->role?->slug === $roles;
+    }
+
     public function hasPermission(string $permissionSlug): bool
     {
         return $this->role?->permissions->contains('slug', $permissionSlug) ?? false;
