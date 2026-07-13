@@ -43,4 +43,13 @@ class Employee extends Model
             ->withPivot('amount')
             ->withTimestamps();
     }
+    public function employeeLoans()
+    {
+        return $this->hasMany(EmployeeLoan::class);
+    }
+
+    public function payslips()
+    {
+        return $this->hasMany(Payslip::class);
+    }
 }

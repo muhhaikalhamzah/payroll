@@ -49,4 +49,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/attendance-records/import-status/{batchId}', [\App\Http\Controllers\AttendanceController::class, 'importStatus'])->name('attendance-records.import-status');
     Route::resource('/attendance-records', \App\Http\Controllers\AttendanceController::class)->except(['show']);
     Route::resource('/overtime-requests', \App\Http\Controllers\OvertimeRequestController::class)->except(['show']);
+
+    // Payroll Calculation & Generation
+    Route::resource('/payroll-runs', \App\Http\Controllers\PayrollRunController::class)->only(['index', 'create', 'store', 'show']);
+    Route::get('/payslips/{payslip}', [\App\Http\Controllers\PayslipController::class, 'show'])->name('payslips.show');
 });

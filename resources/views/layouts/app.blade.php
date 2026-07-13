@@ -276,6 +276,16 @@
                 </a>
             </li>
 
+            @can('view-payroll-runs')
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('payroll-runs.*') ? '' : 'collapsed' }}" href="{{ route('payroll-runs.index') }}">
+                  <i class="bi bi-cash-stack"></i>
+                  <span>Payroll Runs</span>
+                </a>
+            </li>
+            @endcan
+
+            @if(Auth::user()->role?->slug === 'super-admin')
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('setting.*') ? '' : 'collapsed' }}"
                     href="{{ route('setting.index') }}">
@@ -283,6 +293,7 @@
                     <span>Setting</span>
                 </a>
             </li>
+            @endif
 
             @can('view-attendances')
                 <li class="nav-item">

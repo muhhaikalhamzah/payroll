@@ -30,9 +30,10 @@ class AppServiceProvider extends ServiceProvider
 
         try {
             if (!app()->runningInConsole() || app()->runningUnitTests()) {
-                $permissions = \Illuminate\Support\Facades\Cache::remember('permissions_with_roles', now()->addHours(24), function () {
-                    return \App\Models\Permission::with('roles')->get();
-                });
+                // $permissions = \Illuminate\Support\Facades\Cache::remember('permissions_with_roles', now()->addHours(24), function () {
+                //     return \App\Models\Permission::with('roles')->get();
+                // });
+                $permissions = \App\Models\Permission::with('roles')->get();
 
                 foreach ($permissions as $permission) {
                     \Illuminate\Support\Facades\Gate::define($permission->slug, function (\App\Models\User $user) use ($permission) {
