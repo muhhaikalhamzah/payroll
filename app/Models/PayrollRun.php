@@ -11,7 +11,7 @@ class PayrollRun extends Model
 {
     use HasFactory, Approvable, Auditable;
 
-    protected $fillable = ['period_month', 'period_year', 'status', 'created_by'];
+    protected $fillable = ['type', 'period_month', 'period_year', 'status', 'created_by'];
 
     public function payslips()
     {

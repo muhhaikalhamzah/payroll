@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             PayrollSeeder::class,
             LeaveSeeder::class,
             EmployeeLoanSeeder::class,
+            ThrSeeder::class,
         ]);
     }
 }

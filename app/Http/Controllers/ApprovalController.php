@@ -27,7 +27,11 @@ class ApprovalController extends Controller
         $model = $this->getModel($type, $id);
 
         if ($type === 'payroll_run') {
-            Gate::authorize('submit-payroll-runs');
+            if ($model->type === 'THR') {
+                Gate::authorize('submit-thr-runs');
+            } else {
+                Gate::authorize('submit-payroll-runs');
+            }
         } elseif ($type === 'leave_request') {
             Gate::authorize('submit-leave-requests');
             // Employee can only submit their own
@@ -96,7 +100,11 @@ class ApprovalController extends Controller
         $model = $this->getModel($type, $id);
 
         if ($type === 'payroll_run') {
-            Gate::authorize('approve-payroll-runs');
+            if ($model->type === 'THR') {
+                Gate::authorize('approve-thr-runs');
+            } else {
+                Gate::authorize('approve-payroll-runs');
+            }
         } elseif ($type === 'leave_request') {
             Gate::authorize('approve-leave-requests');
         } elseif ($type === 'employee_loan') {
@@ -209,7 +217,11 @@ class ApprovalController extends Controller
         $model = $this->getModel($type, $id);
 
         if ($type === 'payroll_run') {
-            Gate::authorize('reject-payroll-runs');
+            if ($model->type === 'THR') {
+                Gate::authorize('reject-thr-runs');
+            } else {
+                Gate::authorize('reject-payroll-runs');
+            }
         } elseif ($type === 'leave_request') {
             Gate::authorize('approve-leave-requests');
         } elseif ($type === 'employee_loan') {
@@ -287,7 +299,11 @@ class ApprovalController extends Controller
         $model = $this->getModel($type, $id);
 
         if ($type === 'payroll_run') {
-            Gate::authorize('mark-payroll-runs-paid');
+            if ($model->type === 'THR') {
+                Gate::authorize('mark-thr-runs-paid');
+            } else {
+                Gate::authorize('mark-payroll-runs-paid');
+            }
         }
 
         try {

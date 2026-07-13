@@ -41,7 +41,14 @@ class RolePermissionSeeder extends Seeder
             'submit-employee-loans',
             'approve-employee-loans',
             'disburse-employee-loans',
-            
+            // THR Runs (New)
+            'view-thr-runs',
+            'create-thr-runs',
+            'submit-thr-runs',
+            'approve-thr-runs',
+            'reject-thr-runs',
+            'mark-thr-runs-paid',
+
             // Audit Logs
             'view-audit-logs',
         ];
@@ -95,12 +102,14 @@ class RolePermissionSeeder extends Seeder
             $permissionModels['manage-employee-loans']->id,
             $permissionModels['export-reports']->id,
             $permissionModels['view-dashboard-analytics']->id,
-            // Leave Management
             $permissionModels['manage-leave-types']->id,
             $permissionModels['manage-leave-balances']->id,
             $permissionModels['view-leave-requests']->id,
             $permissionModels['approve-leave-requests']->id,
             $permissionModels['view-employee-loans-all']->id,
+            $permissionModels['view-thr-runs']->id,
+            $permissionModels['create-thr-runs']->id,
+            $permissionModels['submit-thr-runs']->id,
         ]);
 
         // Finance Admin
@@ -116,6 +125,10 @@ class RolePermissionSeeder extends Seeder
             $permissionModels['view-employee-loans-all']->id,
             $permissionModels['approve-employee-loans']->id,
             $permissionModels['disburse-employee-loans']->id,
+            $permissionModels['view-thr-runs']->id,
+            $permissionModels['approve-thr-runs']->id,
+            $permissionModels['reject-thr-runs']->id,
+            $permissionModels['mark-thr-runs-paid']->id,
         ]);
 
         // Manager

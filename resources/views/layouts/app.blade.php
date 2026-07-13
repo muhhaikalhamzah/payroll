@@ -166,6 +166,19 @@
         .select2-container .select2-selection--single .select2-selection__rendered {
             color: #212529 !important;
         }
+
+        /* Hide Google Translate Toolbar */
+        .goog-te-banner-frame.skiptranslate {
+            display: none !important;
+        } 
+        body {
+            top: 0px !important; 
+        }
+        .goog-te-combo {
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
     </style>
 
     <!-- =======================================================
@@ -201,6 +214,9 @@
                 @endforeach
             </select>
         </form>
+
+        <!-- Google Translate Widget -->
+        <div id="google_translate_element" class="mx-3 mt-2"></div>
 
         <nav class="header-nav ms-auto">
             <ul class="d-flex align-items-center">
@@ -315,6 +331,15 @@
                 <a class="nav-link {{ request()->routeIs('payroll-runs.*') ? '' : 'collapsed' }}" href="{{ route('payroll-runs.index') }}">
                   <i class="bi bi-cash-stack"></i>
                   <span>Payroll Runs</span>
+                </a>
+            </li>
+            @endcan
+
+            @can('view-thr-runs')
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('thr-runs.*') ? '' : 'collapsed' }}" href="{{ route('thr-runs.index') }}">
+                    <i class="bi bi-gift"></i>
+                    <span>THR Runs</span>
                 </a>
             </li>
             @endcan
@@ -602,6 +627,18 @@
     </script>
 
     @stack('scripts')
+
+    <!-- Google Translate Script -->
+    <script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'en', 
+            includedLanguages: 'id,en', 
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+        }, 'google_translate_element');
+    }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 </body>
 
