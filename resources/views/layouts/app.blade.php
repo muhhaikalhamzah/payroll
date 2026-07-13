@@ -359,6 +359,16 @@
                 </li>
             @endcan
 
+            @can('view-employee-loans-own')
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('employee-loans.*') ? '' : 'collapsed' }}"
+                        href="{{ route('employee-loans.index') }}">
+                        <i class='bx bx-wallet'></i>
+                        <span>Employee Loans</span>
+                    </a>
+                </li>
+            @endcan
+
             @can('manage-leave-balances')
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('leave-balances.*') ? '' : 'collapsed' }}"

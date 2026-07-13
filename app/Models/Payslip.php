@@ -10,7 +10,7 @@ class Payslip extends Model
 {
     use HasFactory, Auditable;
 
-    protected $fillable = ['payroll_run_id', 'employee_id', 'basic_salary', 'total_allowances', 'total_deductions', 'net_pay', 'status'];
+    protected $fillable = ['payroll_run_id', 'employee_id', 'basic_salary', 'total_allowances', 'total_deductions', 'net_pay', 'status', 'needs_intervention', 'intervention_reason'];
 
     public function payrollRun()
     {

@@ -35,6 +35,12 @@ class RolePermissionSeeder extends Seeder
             'view-leave-requests',
             'submit-leave-requests',
             'approve-leave-requests',
+            // Employee Loans (New)
+            'view-employee-loans-own',
+            'view-employee-loans-all',
+            'submit-employee-loans',
+            'approve-employee-loans',
+            'disburse-employee-loans',
             
             // Audit Logs
             'view-audit-logs',
@@ -94,6 +100,7 @@ class RolePermissionSeeder extends Seeder
             $permissionModels['manage-leave-balances']->id,
             $permissionModels['view-leave-requests']->id,
             $permissionModels['approve-leave-requests']->id,
+            $permissionModels['view-employee-loans-all']->id,
         ]);
 
         // Finance Admin
@@ -106,6 +113,9 @@ class RolePermissionSeeder extends Seeder
             $permissionModels['view-payslip-all']->id,
             $permissionModels['export-reports']->id,
             $permissionModels['view-dashboard-analytics']->id,
+            $permissionModels['view-employee-loans-all']->id,
+            $permissionModels['approve-employee-loans']->id,
+            $permissionModels['disburse-employee-loans']->id,
         ]);
 
         // Manager
@@ -127,6 +137,8 @@ class RolePermissionSeeder extends Seeder
             $permissionModels['view-attendances']->id,
             $permissionModels['view-overtime-requests']->id,
             $permissionModels['submit-overtime-requests']->id,
+            $permissionModels['view-employee-loans-own']->id,
+            $permissionModels['submit-employee-loans']->id,
         ]);
     }
 }

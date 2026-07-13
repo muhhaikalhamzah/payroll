@@ -24,9 +24,13 @@ class PayrollSeeder extends Seeder
         foreach ($employees->random(min(3, $employees->count())) as $emp) {
             EmployeeLoan::create([
                 'employee_id' => $emp->id,
+                'request_date' => Carbon::now()->subMonths(4),
+                'reason' => 'Legacy loan',
                 'total_amount' => 5000000,
-                'remaining_amount' => 4500000,
+                'requested_tenor_months' => 10,
+                'remaining_balance' => 4500000,
                 'monthly_installment' => 500000,
+                'status' => 'DISBURSED',
             ]);
         }
 

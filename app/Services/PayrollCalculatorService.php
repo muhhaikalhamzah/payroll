@@ -74,15 +74,18 @@ class PayrollCalculatorService
         }
 
         // 4. Employee Loans (deduction)
-        $loans = $employee->employeeLoans()->where('remaining_amount', '>', 0)->get();
+        $loans = $employee->employeeLoans()->where('remaining_balance', '>', 0)->where('status', 'DISBURSED')->get();
+        $loanDeductions = [];
+        $totalLoanDeductions = 0;
         foreach ($loans as $loan) {
-            $installment = min($loan->monthly_installment, $loan->remaining_amount);
+            $installment = min($loan->monthly_installment, $loan->remaining_balance);
             if ($installment > 0) {
-                $deductions[] = [
+                $loanDeductions[] = [
                     'name' => 'Loan Installment',
                     'amount' => $installment,
                     'loan_id' => $loan->id, // For tracking
                 ];
+                $totalLoanDeductions += $installment;
             }
         }
 
@@ -108,9 +111,8 @@ class PayrollCalculatorService
         $deductions[] = ['name' => 'BPJS Kesehatan (1%)', 'amount' => $kesAmount];
 
         // 7. PPh 21 (TER logic simplified)
-        // Assume all active employees use TER A for now, with a basic rate if > PTKP
         $terCategory = 'A';
-        $pph21Rate = 0.05; // Dummy logic for example. Ideally, lookup from a tax_configs table based on $grossPay.
+        $pph21Rate = 0.05; 
         $pph21Amount = max(0, $grossPay * $pph21Rate);
 
         $taxRecord = [
@@ -123,7 +125,37 @@ class PayrollCalculatorService
             $deductions[] = ['name' => 'PPh 21', 'amount' => $pph21Amount];
         }
 
-        // 8. Net Pay
+        // 8. Calculate total mandatory deductions
+        $totalMandatoryDeductions = array_sum(array_column($deductions, 'amount'));
+
+        // 9. Apply Loan Deductions with 50% Gross Pay Limit
+        $maxTotalDeductions = $grossPay * 0.5;
+        $needsIntervention = false;
+        $interventionReason = null;
+
+        $availableForLoan = $maxTotalDeductions - $totalMandatoryDeductions;
+        if ($availableForLoan < 0) {
+            $availableForLoan = 0; // cannot deduct any loan
+        }
+
+        foreach ($loanDeductions as &$ld) {
+            if ($ld['amount'] > $availableForLoan) {
+                // We have to reduce the loan deduction
+                $originalAmount = $ld['amount'];
+                $ld['amount'] = $availableForLoan;
+                $needsIntervention = true;
+                $interventionReason = "Loan deduction was reduced from " . number_format($originalAmount) . " to " . number_format($availableForLoan) . " because total deductions exceed 50% of gross pay.";
+                $availableForLoan = 0; // exhausted
+            } else {
+                $availableForLoan -= $ld['amount'];
+            }
+
+            if ($ld['amount'] > 0) {
+                $deductions[] = $ld;
+            }
+        }
+
+        // 10. Net Pay
         $totalDeductions = array_sum(array_column($deductions, 'amount'));
         $netPay = $grossPay - $totalDeductions;
 
@@ -136,6 +168,8 @@ class PayrollCalculatorService
             'deduction_components' => $deductions,
             'tax_record' => $taxRecord,
             'bpjs_record' => $bpjsRecord,
+            'needs_intervention' => $needsIntervention,
+            'intervention_reason' => $interventionReason,
         ];
     }
 }

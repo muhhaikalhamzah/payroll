@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->decimal('amount', 15, 2);
             $table->enum('type', ['allowance', 'deduction']);
+            $table->foreignId('employee_loan_id')->nullable()->constrained()->nullOnDelete();
             $table->timestamps();
         });
     }

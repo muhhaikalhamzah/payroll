@@ -20,6 +20,8 @@ return new class extends Migration
             $table->decimal('total_deductions', 15, 2)->default(0);
             $table->decimal('net_pay', 15, 2)->default(0);
             $table->enum('status', ['DRAFT', 'FINAL'])->default('DRAFT');
+            $table->boolean('needs_intervention')->default(false);
+            $table->text('intervention_reason')->nullable();
             $table->timestamps();
         });
     }

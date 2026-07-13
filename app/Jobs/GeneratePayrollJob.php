@@ -54,7 +54,9 @@ class GeneratePayrollJob implements ShouldQueue
                             'total_allowances' => $calcResult['total_allowances'],
                             'total_deductions' => $calcResult['total_deductions'],
                             'net_pay' => $calcResult['net_pay'],
-                            'status' => 'DRAFT'
+                            'status' => 'DRAFT',
+                            'needs_intervention' => $calcResult['needs_intervention'] ?? false,
+                            'intervention_reason' => $calcResult['intervention_reason'] ?? null,
                         ]);
 
                         foreach ($calcResult['allowance_components'] as $allowance) {
@@ -72,6 +74,7 @@ class GeneratePayrollJob implements ShouldQueue
                                 'name' => $deduction['name'],
                                 'amount' => $deduction['amount'],
                                 'type' => 'deduction',
+                                'employee_loan_id' => $deduction['loan_id'] ?? null,
                             ]);
                         }
 

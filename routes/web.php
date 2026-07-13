@@ -74,4 +74,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/approvals/{type}/{id}/approve', [\App\Http\Controllers\ApprovalController::class, 'approve'])->name('approvals.approve');
     Route::post('/approvals/{type}/{id}/reject', [\App\Http\Controllers\ApprovalController::class, 'reject'])->name('approvals.reject');
     Route::post('/approvals/{type}/{id}/mark-paid', [\App\Http\Controllers\ApprovalController::class, 'markPaid'])->name('approvals.mark-paid');
+
+    // Employee Loans
+    Route::resource('/employee-loans', \App\Http\Controllers\EmployeeLoanController::class)->except(['edit', 'update', 'destroy']);
+    Route::post('/employee-loans/{id}/disburse', [\App\Http\Controllers\EmployeeLoanController::class, 'disburse'])->name('employee-loans.disburse');
 });

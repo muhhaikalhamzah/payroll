@@ -16,6 +16,8 @@ class ApprovalController extends Controller
             return PayrollRun::findOrFail($id);
         } elseif ($type === 'leave_request') {
             return LeaveRequest::findOrFail($id);
+        } elseif ($type === 'employee_loan') {
+            return \App\Models\EmployeeLoan::findOrFail($id);
         }
         abort(404, 'Unknown approvable type');
     }
@@ -97,6 +99,8 @@ class ApprovalController extends Controller
             Gate::authorize('approve-payroll-runs');
         } elseif ($type === 'leave_request') {
             Gate::authorize('approve-leave-requests');
+        } elseif ($type === 'employee_loan') {
+            Gate::authorize('approve-employee-loans');
         }
 
         $request->validate([
@@ -143,6 +147,15 @@ class ApprovalController extends Controller
                     throw new \Exception('Invalid status for approval.');
                 }
                 $model->save();
+            } elseif ($type === 'employee_loan') {
+                $model = \App\Models\EmployeeLoan::where('id', $id)->lockForUpdate()->firstOrFail();
+                if ($model->status !== 'PENDING_FINANCE') {
+                    throw new \Exception('Only PENDING_FINANCE can be approved.');
+                }
+                $model->status = 'APPROVED';
+                $model->approved_by = auth()->id();
+                $model->approved_at = now();
+                $model->save();
             }
 
             $model->approveApproval(null, $request->comments, $status);
@@ -173,6 +186,13 @@ class ApprovalController extends Controller
                         ));
                     }
                 }
+            } elseif ($model instanceof \App\Models\EmployeeLoan) {
+                if ($model->employee && $model->employee->user) {
+                    $model->employee->user->notify(new \App\Notifications\StatusChangedNotification(
+                        "Loan Request Approved",
+                        "Your loan request of Rp " . number_format($model->total_amount, 0, ',', '.') . " has been approved and is awaiting disbursement."
+                    ));
+                }
             }
 
             DB::commit();
@@ -192,6 +212,8 @@ class ApprovalController extends Controller
             Gate::authorize('reject-payroll-runs');
         } elseif ($type === 'leave_request') {
             Gate::authorize('approve-leave-requests');
+        } elseif ($type === 'employee_loan') {
+            Gate::authorize('approve-employee-loans');
         }
 
         $request->validate([
@@ -215,6 +237,13 @@ class ApprovalController extends Controller
                 }
                 $model->status = 'REJECTED';
                 $model->save();
+            } elseif ($type === 'employee_loan') {
+                $model = \App\Models\EmployeeLoan::where('id', $id)->lockForUpdate()->firstOrFail();
+                if ($model->status !== 'PENDING_FINANCE') {
+                    throw new \Exception('Only PENDING_FINANCE can be rejected.');
+                }
+                $model->status = 'REJECTED';
+                $model->save();
             }
 
             $model->rejectApproval(null, $request->comments);
@@ -233,6 +262,13 @@ class ApprovalController extends Controller
                     $model->employee->user->notify(new \App\Notifications\StatusChangedNotification(
                         "Leave Request Rejected",
                         "Your leave request has been rejected. Reason: " . $request->comments
+                    ));
+                }
+            } elseif ($model instanceof \App\Models\EmployeeLoan) {
+                if ($model->employee && $model->employee->user) {
+                    $model->employee->user->notify(new \App\Notifications\StatusChangedNotification(
+                        "Loan Request Rejected",
+                        "Your loan request has been rejected. Reason: " . $request->comments
                     ));
                 }
             }
@@ -264,6 +300,27 @@ class ApprovalController extends Controller
                 }
                 $model->status = 'PAID';
                 $model->save();
+
+                // Deduct remaining balance of loans for each payslip
+                $payslips = \App\Models\Payslip::where('payroll_run_id', $model->id)->with('components')->get();
+                foreach ($payslips as $payslip) {
+                    $payslip->status = 'FINAL';
+                    $payslip->save();
+
+                    foreach ($payslip->components as $component) {
+                        if ($component->employee_loan_id) {
+                            $loan = \App\Models\EmployeeLoan::where('id', $component->employee_loan_id)->lockForUpdate()->first();
+                            if ($loan && $loan->status === 'DISBURSED') {
+                                $loan->remaining_balance -= $component->amount;
+                                if ($loan->remaining_balance <= 0) {
+                                    $loan->remaining_balance = 0;
+                                    $loan->status = 'COMPLETED';
+                                }
+                                $loan->save();
+                            }
+                        }
+                    }
+                }
 
                 // Add log for PAID
                 $approval = $model->latestApproval;
