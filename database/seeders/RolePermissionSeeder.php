@@ -14,7 +14,7 @@ class RolePermissionSeeder extends Seeder
     {
         $permissionsList = [
             'view-users', 'create-user', 'update-user', 'delete-user',
-            'view-payroll-runs', 'create-payroll-runs', 'approve-payroll-run',
+            'view-payroll-runs', 'create-payroll-runs',
             'submit-leave-request', 'approve-leave-request',
             'view-payslip-own', 'view-payslip-all',
             'view-departments', 'manage-departments',
@@ -25,7 +25,8 @@ class RolePermissionSeeder extends Seeder
             'view-bank-accounts', 'manage-bank-accounts',
             'view-attendances', 'manage-attendances', 'import-attendances',
             'view-overtime-requests', 'submit-overtime-requests', 'approve-overtime-requests', 'manage-overtime-requests',
-            'manage-employee-loans'
+            'manage-employee-loans',
+            'submit-payroll-runs', 'approve-payroll-runs', 'reject-payroll-runs', 'mark-payroll-runs-paid'
         ];
 
         $permissionModels = [];
@@ -73,6 +74,7 @@ class RolePermissionSeeder extends Seeder
             $permissionModels['manage-overtime-requests']->id,
             $permissionModels['view-payroll-runs']->id,
             $permissionModels['create-payroll-runs']->id,
+            $permissionModels['submit-payroll-runs']->id,
             $permissionModels['manage-employee-loans']->id,
         ]);
 
@@ -80,7 +82,9 @@ class RolePermissionSeeder extends Seeder
         $financeAdmin->permissions()->syncWithoutDetaching([
             $permissionModels['view-payroll-runs']->id,
             $permissionModels['create-payroll-runs']->id,
-            $permissionModels['approve-payroll-run']->id,
+            $permissionModels['approve-payroll-runs']->id,
+            $permissionModels['reject-payroll-runs']->id,
+            $permissionModels['mark-payroll-runs-paid']->id,
             $permissionModels['view-payslip-all']->id,
         ]);
 

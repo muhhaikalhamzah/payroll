@@ -53,4 +53,10 @@ Route::middleware('auth')->group(function () {
     // Payroll Calculation & Generation
     Route::resource('/payroll-runs', \App\Http\Controllers\PayrollRunController::class)->only(['index', 'create', 'store', 'show']);
     Route::get('/payslips/{payslip}', [\App\Http\Controllers\PayslipController::class, 'show'])->name('payslips.show');
+
+    // Generic Approvals
+    Route::post('/approvals/{type}/{id}/submit', [\App\Http\Controllers\ApprovalController::class, 'submit'])->name('approvals.submit');
+    Route::post('/approvals/{type}/{id}/approve', [\App\Http\Controllers\ApprovalController::class, 'approve'])->name('approvals.approve');
+    Route::post('/approvals/{type}/{id}/reject', [\App\Http\Controllers\ApprovalController::class, 'reject'])->name('approvals.reject');
+    Route::post('/approvals/{type}/{id}/mark-paid', [\App\Http\Controllers\ApprovalController::class, 'markPaid'])->name('approvals.mark-paid');
 });

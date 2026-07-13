@@ -16,7 +16,38 @@
     <div class="col-lg-12">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">Employee Payslips</h5>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title mb-0">Employee Payslips</h5>
+            
+            <div class="d-flex gap-2">
+                @if($payroll_run->status === 'DRAFT')
+                    @can('submit-payroll-runs')
+                    <form action="{{ route('approvals.submit', ['type' => 'payroll_run', 'id' => $payroll_run->id]) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-primary" onclick="return confirm('Submit this payroll for Finance approval?')">Submit to Finance</button>
+                    </form>
+                    @endcan
+                @elseif($payroll_run->status === 'PENDING_FINANCE')
+                    @can('approve-payroll-runs')
+                    <form action="{{ route('approvals.approve', ['type' => 'payroll_run', 'id' => $payroll_run->id]) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-success" onclick="return confirm('Approve this payroll run?')">Approve</button>
+                    </form>
+                    @endcan
+                    @can('reject-payroll-runs')
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">Reject</button>
+                    @endcan
+                @elseif($payroll_run->status === 'APPROVED')
+                    @can('mark-payroll-runs-paid')
+                    <form action="{{ route('approvals.mark-paid', ['type' => 'payroll_run', 'id' => $payroll_run->id]) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-success" onclick="return confirm('Mark this payroll as PAID?')">Mark as PAID</button>
+                    </form>
+                    @endcan
+                @endif
+                <span class="badge bg-secondary d-flex align-items-center px-3 fs-6">{{ $payroll_run->status }}</span>
+            </div>
+          </div>
           
           <table class="table table-bordered">
             <thead>
@@ -50,4 +81,30 @@
     </div>
   </div>
 </section>
+
+@push('modals')
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="{{ route('approvals.reject', ['type' => 'payroll_run', 'id' => $payroll_run->id]) }}" method="POST">
+        @csrf
+        <div class="modal-header">
+          <h5 class="modal-title" id="rejectModalLabel">Reject Payroll Run</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="comments" class="form-label">Reason for Rejection <span class="text-danger">*</span></label>
+            <textarea class="form-control" id="comments" name="comments" rows="3" required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger">Reject Payroll</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+@endpush
 </x-app>
