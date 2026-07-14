@@ -52,19 +52,24 @@ class ThrCalculatorService
         // 3. Tax Calculation (PPh 21 Non-Reguler)
         $taxStatus = $employee->tax_status ?? 'TK/0';
 
-        // Step 1: Pajak A (Reguler Disetahunkan)
-        $annualizedRegularGross = $regularGrossPay * 12;
-        $taxA = $this->calculateProgressiveTax($annualizedRegularGross, $taxStatus);
+        // Step 1: Pajak A (Pajak Reguler bulanan menggunakan TER)
+        $pph21Calc = new \App\Services\PPh21CalculatorService();
+        $taxA = $pph21Calc->calculateMonthlyTER(
+            $employee,
+            $regularGrossPay
+        );
 
-        // Step 2: Pajak B (Reguler Disetahunkan + THR)
-        $annualizedTotalGross = $annualizedRegularGross + $thrAmount;
-        $taxB = $this->calculateProgressiveTax($annualizedTotalGross, $taxStatus);
+        // Step 2: Pajak B (Pajak Reguler + THR menggunakan TER)
+        $taxB = $pph21Calc->calculateMonthlyTER(
+            $employee,
+            $regularGrossPay + $thrAmount
+        );
 
         // Step 3: Pajak B - Pajak A = PPh 21 THR
         $pph21Amount = max(0, $taxB - $taxA);
 
         $taxRecord = [
-            'ter_category' => 'NON-REGULER (THR)',
+            'ter_category' => 'NON-REGULER (THR TER)',
             'bruto_amount' => $thrAmount,
             'pph21_amount' => $pph21Amount,
         ];
@@ -107,55 +112,5 @@ class ThrCalculatorService
         ];
     }
 
-    /**
-     * Simplified Progressive Tax Calculation (Pasal 17).
-     * Calculates PTKP dynamically based on tax status.
-     */
-    private function calculateProgressiveTax(float $annualIncome, string $taxStatus): float
-    {
-        $ptkpMap = [
-            'TK/0' => 54000000,
-            'TK/1' => 58500000,
-            'TK/2' => 63000000,
-            'TK/3' => 67500000,
-            'K/0'  => 58500000,
-            'K/1'  => 63000000,
-            'K/2'  => 67500000,
-            'K/3'  => 72000000,
-        ];
-        
-        $ptkp = $ptkpMap[$taxStatus] ?? 54000000;
-        $pkp = max(0, $annualIncome - $ptkp);
 
-        if ($pkp <= 0) return 0;
-
-        $tax = 0;
-        
-        // Layer 1: 0 - 60,000,000 (5%)
-        if ($pkp > 60000000) {
-            $tax += 60000000 * 0.05;
-            $pkp -= 60000000;
-        } else {
-            return $tax + ($pkp * 0.05);
-        }
-
-        // Layer 2: 60,000,000 - 250,000,000 (15%)
-        if ($pkp > 190000000) {
-            $tax += 190000000 * 0.15;
-            $pkp -= 190000000;
-        } else {
-            return $tax + ($pkp * 0.15);
-        }
-
-        // Layer 3: 250,000,000 - 500,000,000 (25%)
-        if ($pkp > 250000000) {
-            $tax += 250000000 * 0.25;
-            $pkp -= 250000000;
-        } else {
-            return $tax + ($pkp * 0.25);
-        }
-
-        // Layer 4: > 500,000,000 (30%)
-        return $tax + ($pkp * 0.30);
-    }
 }

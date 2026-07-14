@@ -4,6 +4,5 @@ $app = require_once __DIR__.'/bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
-$request = Illuminate\Http\Request::create('/thr-runs/7/submit', 'POST');
-$route = app('router')->getRoutes()->match($request);
-print_r($route->parameters());
+$roles = \App\Models\Role::pluck('slug')->toArray();
+print_r($roles);

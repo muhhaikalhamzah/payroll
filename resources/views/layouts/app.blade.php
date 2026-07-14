@@ -458,60 +458,60 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('attendance-records.*') ? '' : 'collapsed' }}"
                         href="{{ route('attendance-records.index') }}">
-                        <i class='bx bx-check-circle'></i>
-                        <span>Attendance</span>
-                    </a>
-                </li>
+                          <i class='bx bx-check-circle'></i>
+                          <span>{{ __('sidebar.attendance') }}</span>
+                      </a>
+                  </li>
             @endcan
 
             @can('view-overtime-requests')
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('overtime-requests.*') ? '' : 'collapsed' }}"
                         href="{{ route('overtime-requests.index') }}">
-                        <i class='bx bx-time'></i>
-                        <span>Overtime</span>
-                    </a>
-                </li>
+                          <i class='bx bx-time'></i>
+                          <span>{{ __('sidebar.overtime') }}</span>
+                      </a>
+                  </li>
             @endcan
 
             @can('view-leave-requests')
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('leave-requests.*') ? '' : 'collapsed' }}"
                         href="{{ route('leave-requests.index') }}">
-                        <i class='bx bx-calendar-event'></i>
-                        <span>Leave Requests</span>
-                    </a>
-                </li>
+                          <i class='bx bx-calendar-event'></i>
+                          <span>{{ __('sidebar.leave_requests') }}</span>
+                      </a>
+                  </li>
             @endcan
 
             @can('view-employee-loans-own')
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('employee-loans.*') ? '' : 'collapsed' }}"
                         href="{{ route('employee-loans.index') }}">
-                        <i class='bx bx-wallet'></i>
-                        <span>Employee Loans</span>
-                    </a>
-                </li>
+                          <i class='bx bx-wallet'></i>
+                          <span>{{ __('sidebar.employee_loans') }}</span>
+                      </a>
+                  </li>
             @endcan
 
             @can('manage-leave-balances')
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('leave-balances.*') ? '' : 'collapsed' }}"
                         href="{{ route('leave-balances.index') }}">
-                        <i class='bx bx-calendar-check'></i>
-                        <span>Leave Balances</span>
-                    </a>
-                </li>
+                          <i class='bx bx-calendar-check'></i>
+                          <span>{{ __('sidebar.leave_balances') }}</span>
+                      </a>
+                  </li>
             @endcan
 
             @can('manage-leave-types')
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('leave-types.*') ? '' : 'collapsed' }}"
                         href="{{ route('leave-types.index') }}">
-                        <i class='bx bx-calendar-star'></i>
-                        <span>Leave Types</span>
-                    </a>
-                </li>
+                          <i class='bx bx-calendar-star'></i>
+                          <span>{{ __('sidebar.leave_types') }}</span>
+                      </a>
+                  </li>
             @endcan
 
 
@@ -520,70 +520,70 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('departments.*') ? '' : 'collapsed' }}"
                         href="{{ route('departments.index') }}">
-                        <i class='bx bx-building'></i>
-                        <span>Departments</span>
-                    </a>
-                </li>
+                          <i class='bx bx-buildings'></i>
+                          <span>{{ __('sidebar.departments') }}</span>
+                      </a>
+                  </li>
             @endcan
 
             @can('view-positions')
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('positions.*') ? '' : 'collapsed' }}"
                         href="{{ route('positions.index') }}">
-                        <i class='bx bx-briefcase'></i>
-                        <span>Positions</span>
-                    </a>
-                </li>
+                          <i class='bx bx-briefcase'></i>
+                          <span>{{ __('sidebar.positions') }}</span>
+                      </a>
+                  </li>
             @endcan
 
             @can('view-salary-components')
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('salary-components.*') ? '' : 'collapsed' }}"
                         href="{{ route('salary-components.index') }}">
-                        <i class='bx bx-list-ul'></i>
-                        <span>Salary Components</span>
-                    </a>
-                </li>
+                          <i class='bx bx-list-ul'></i>
+                          <span>{{ __('sidebar.salary_components') }}</span>
+                      </a>
+                  </li>
             @endcan
 
             @can('view-salary-structures')
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('salary-structures.*') ? '' : 'collapsed' }}"
                         href="{{ route('salary-structures.index') }}">
-                        <i class='bx bx-money'></i>
-                        <span>Salary Structures</span>
-                    </a>
-                </li>
+                          <i class='bx bx-layer'></i>
+                          <span>{{ __('sidebar.salary_structures') }}</span>
+                      </a>
+                  </li>
             @endcan
 
             @can('view-employees')
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('employees.*') ? '' : 'collapsed' }}"
                         href="{{ route('employees.index') }}">
-                        <i class='bx bx-group'></i>
-                        <span>Employees</span>
-                    </a>
-                </li>
+                          <i class='bx bx-user-pin'></i>
+                          <span>{{ __('sidebar.employees') }}</span>
+                      </a>
+                  </li>
             @endcan
 
             @can('view-users')
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('user.*') ? '' : 'collapsed' }}"
                         href="{{ route('user.index') }}">
-                        <i class='bx bx-user-pin'></i>
-                        <span>User</span>
-                    </a>
-                </li>
+                          <i class='bx bx-group'></i>
+                          <span>{{ __('sidebar.user') }}</span>
+                      </a>
+                  </li>
             @endcan
 
             @if(Auth::user()->role?->slug === 'super-admin')
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('audit-logs.*') ? '' : 'collapsed' }}"
                         href="{{ route('audit-logs.index') }}">
-                        <i class='bx bx-shield-quarter'></i>
-                        <span>Audit Logs</span>
-                    </a>
-                </li>
+                          <i class='bx bx-history'></i>
+                          <span>{{ __('sidebar.audit_logs') }}</span>
+                      </a>
+                  </li>
             @endif
 
         </ul>

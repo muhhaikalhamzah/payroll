@@ -40,12 +40,6 @@ Route::middleware('auth')->group(function () {
     Route::resource('/salary-structures', SalaryStructureController::class)->except(['show']);
     Route::resource('thr-runs', \App\Http\Controllers\ThrRunController::class)->only(['index', 'create', 'store', 'show']);
     
-    // Approvals for THR Runs
-    Route::post('/thr-runs/{id}/submit', [\App\Http\Controllers\ApprovalController::class, 'submit'])->defaults('type', 'payroll_run')->name('thr-runs.submit');
-    Route::post('/thr-runs/{id}/approve', [\App\Http\Controllers\ApprovalController::class, 'approve'])->defaults('type', 'payroll_run')->name('thr-runs.approve');
-    Route::post('/thr-runs/{id}/reject', [\App\Http\Controllers\ApprovalController::class, 'reject'])->defaults('type', 'payroll_run')->name('thr-runs.reject');
-    Route::post('/thr-runs/{id}/mark-paid', [\App\Http\Controllers\ApprovalController::class, 'markPaid'])->defaults('type', 'payroll_run')->name('thr-runs.mark-paid');
-
     Route::resource('/leave-types', \App\Http\Controllers\LeaveTypeController::class)->except(['show']);
     
     // Employee Data Management
